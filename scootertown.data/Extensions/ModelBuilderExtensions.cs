@@ -30,20 +30,43 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
         {
             if (!string.IsNullOrWhiteSpace(storeOptions.DefaultSchema)) modelBuilder.HasDefaultSchema(storeOptions.DefaultSchema);
                         
+            CalendarConfig calendarConfig = (calendar) =>
+            {
+                calendar.ToTable(storeOptions.Calendar);
+
+                calendar.HasKey(x => x.DateKey);
+
+                calendar.Property(x => x.Date).IsRequired().HasColumnType("Date");
+                calendar.Property(x => x.Day);
+                calendar.Property(x => x.WeekDayName);
+                calendar.Property(x => x.IsWeekend);
+                calendar.Property(x => x.IsHoliday);
+                calendar.Property(x => x.HolidayText);
+                calendar.Property(x => x.DayOfYear);
+                calendar.Property(x => x.WeekOfMonth);
+                calendar.Property(x => x.WeekOfYear);
+                calendar.Property(x => x.Month);
+                calendar.Property(x => x.MonthName);
+                calendar.Property(x => x.Year);
+                calendar.Property(x => x.MMYYYY);
+                calendar.Property(x => x.MonthYear);
+
+                calendar.HasMany(x => x.Trips).WithRequired(x => x.StartDate);
+                calendar.HasMany(x => x.Trips).WithRequired(x => x.EndDate);
+            };
+            calendarConfig(modelBuilder.Entity<Calendar>());
+
             VehicleConfig vehicleConfig = (vehicle) =>
             {
                 vehicle.ToTable(storeOptions.Vehicle);
 
                 vehicle.HasKey(x => x.Key);
 
-                vehicle.Property(x => x.CompanyKey);
-                vehicle.Property(x => x.Name).HasMaxLength(200).IsRequired();
-                vehicle.Property(x => x.Description).HasMaxLength(1000);
-                vehicle.Property(x => x.PWNumber).HasMaxLength(8);
-                vehicle.Property(x => x.FleetID).HasMaxLength(6);
+                vehicle.Property(x => x.AlternateKey);
+                vehicle.Property(x => x.Created);
+                vehicle.Property(x => x.Modified);
 
-                vehicle.HasIndex(x => x.Name).IsUnique();
-                vehicle.HasIndex(x => x.CompanyKey).IsUnique();
+                vehicle.HasIndex(x => x.AlternateKey).IsUnique();
             };
 
             vehicleConfig(modelBuilder.Entity<Vehicle>());
@@ -98,29 +121,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 type.HasMany(x => x.Locations).WithOne(x => x.Type).OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Calendar>(calendar => 
-            {
-                calendar.ToTable(storeOptions.Calendar);
-
-                calendar.HasKey(x => x.DateKey);
-
-                calendar.Property(x => x.Date).IsRequired().HasColumnType("Date");
-                calendar.Property(x => x.Day);
-                calendar.Property(x => x.WeekDayName);
-                calendar.Property(x => x.IsWeekend);
-                calendar.Property(x => x.IsHoliday);
-                calendar.Property(x => x.HolidayText);
-                calendar.Property(x => x.DayOfYear);
-                calendar.Property(x => x.WeekOfMonth);
-                calendar.Property(x => x.WeekOfYear);
-                calendar.Property(x => x.Month);
-                calendar.Property(x => x.MonthName);
-                calendar.Property(x => x.Year);
-                calendar.Property(x => x.MMYYYY);
-                calendar.Property(x => x.MonthYear);
-
-                calendar.HasMany(x => x.Locations).WithOne(x => x.Date).OnDelete(DeleteBehavior.Restrict);
-            });
+            
 
             modelBuilder.Entity<VehicleLocation>(location =>
             {
