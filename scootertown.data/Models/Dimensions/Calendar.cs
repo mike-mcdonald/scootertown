@@ -23,7 +23,10 @@ namespace PDX.PBOT.Scootertown.Data.Models.Dimensions
 		public string MMYYYY { get; set; }
 		public string MonthYear { get; set; }
 
-        public List<VehicleLocation> Locations { get; set; }
+        public List<Deployment> Deployments { get; set; }
+		public List<Trip> Trips { get; set; }
+		public List<Collision> Collisions { get; set; }
+		public List<Complaint> Complaints { get; set; }
 	} 
 }
 

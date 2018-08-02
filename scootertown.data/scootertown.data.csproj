@@ -1,7 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <AssemblyName>PDX.PBOT.Scootertown.Data</AssemblyName>
+    <OutputType>Library</OutputType>
+    <PackageId>PDX.PBOT.Scootertown.Data</PackageId>
+    <RootNamespace>PDX.PBOT.Scootertown.Data</RootNamespace>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="automapper" Version="7.0.1" />
+    <PackageReference Include="entityframework" Version="6.2.0" />
+  </ItemGroup>
 
 </Project>

@@ -1,45 +1,52 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Data.Entity;
 using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
+using System.Data.Entity.ModelConfiguration;
 
 namespace PDX.PBOT.Scootertown.Data.Extensions
 {
     public static class ModelBuilderExtensions
     {
-        private static EntityTypeBuilder<TEntity> ToTable<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder, TableConfiguration configuration)
+        delegate void CalendarConfig(EntityTypeConfiguration<Calendar> calendar);
+        delegate void CompanyConfig(EntityTypeConfiguration<Company> company);
+        delegate void PaymentTypeConfig(EntityTypeConfiguration<PaymentType> paymentType);
+        delegate void PlacementReasonConfig(EntityTypeConfiguration<PlacementReason> placementReason);
+        delegate void RemovalReasonConfig(EntityTypeConfiguration<RemovalReason> removalReason);
+        delegate void VehicleTypeConfig(EntityTypeConfiguration<VehicleType> vehicleType);
+        delegate void VehicleConfig(EntityTypeConfiguration<Vehicle> vehicle);
+        delegate void CollisionConfig(EntityTypeConfiguration<Collision> collision);
+        delegate void ComplaintConfig(EntityTypeConfiguration<Complaint> complaint);
+        delegate void DeploymentConfig(EntityTypeConfiguration<Deployment> deployment);
+        delegate void TripConfig(EntityTypeConfiguration<Trip> trip);
+
+        private static EntityTypeConfiguration<TEntity> ToTable<TEntity>(this EntityTypeConfiguration<TEntity> entityTypeBuilder, TableConfiguration configuration)
             where TEntity : class
         {
             return string.IsNullOrWhiteSpace(configuration.Schema) ? entityTypeBuilder.ToTable(configuration.Name) : entityTypeBuilder.ToTable(configuration.Name, configuration.Schema);
         }
 
-        public static void ConfigureContext(this ModelBuilder modelBuilder, VehicleStoreOptions storeOptions)
+        public static void ConfigureContext(this DbModelBuilder modelBuilder, VehicleStoreOptions storeOptions)
         {
             if (!string.IsNullOrWhiteSpace(storeOptions.DefaultSchema)) modelBuilder.HasDefaultSchema(storeOptions.DefaultSchema);
-
-            modelBuilder.Entity<Vehicle>(vehicle =>
+                        
+            VehicleConfig vehicleConfig = (vehicle) =>
             {
                 vehicle.ToTable(storeOptions.Vehicle);
 
                 vehicle.HasKey(x => x.Key);
 
-                vehicle.Property(x => x.NavManKey);
+                vehicle.Property(x => x.CompanyKey);
                 vehicle.Property(x => x.Name).HasMaxLength(200).IsRequired();
                 vehicle.Property(x => x.Description).HasMaxLength(1000);
                 vehicle.Property(x => x.PWNumber).HasMaxLength(8);
                 vehicle.Property(x => x.FleetID).HasMaxLength(6);
 
                 vehicle.HasIndex(x => x.Name).IsUnique();
-                vehicle.HasIndex(x => x.NavManKey).IsUnique();
+                vehicle.HasIndex(x => x.CompanyKey).IsUnique();
+            };
 
-                vehicle.HasOne(x => x.Bureau).WithMany(x => x.Vehicles).OnDelete(DeleteBehavior.Restrict);
-                vehicle.HasOne(x => x.Group).WithMany(x => x.Vehicles).OnDelete(DeleteBehavior.Restrict);
-                vehicle.HasOne(x => x.Type).WithMany(x => x.Vehicles).OnDelete(DeleteBehavior.Restrict);
-                vehicle.HasMany(x => x.Locations).WithOne(x => x.Vehicle).OnDelete(DeleteBehavior.Restrict);
-                
-            });
+            vehicleConfig(modelBuilder.Entity<Vehicle>());
 
             modelBuilder.Entity<VehicleBureau>(bureau => 
             {
