@@ -8,6 +8,7 @@ namespace PDX.PBOT.Scootertown.Data.Models.Dimensions
     {
         public int Key { get; set; }
         public string AlternateKey { get; set; }
+        public bool Registered { get; set; }
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
 

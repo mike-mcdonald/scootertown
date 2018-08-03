@@ -63,6 +63,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 vehicle.HasKey(x => x.Key);
 
                 vehicle.Property(x => x.AlternateKey);
+                vehicle.Property(x => x.Registered);
                 vehicle.Property(x => x.Created);
                 vehicle.Property(x => x.Modified);
 
