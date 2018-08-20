@@ -1,12 +1,10 @@
-using System;
 using System.Threading.Tasks;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 
 namespace PDX.PBOT.Scootertown.Data.Repositories.Interfaces
 {
-    public interface ICalendarRepository
+    public interface ICompanyRepository : IRepository<Company>
     {
-        Task<Calendar> Find(DateTime date);
-        Task<Calendar> Add(DateTime date);
+        Task<long> GetTripCount(string companyName);
     }
 }
