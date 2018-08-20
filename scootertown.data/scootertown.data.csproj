@@ -1,19 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>PDX.PBOT.Scootertown.Data</AssemblyName>
     <OutputType>Library</OutputType>
     <PackageId>PDX.PBOT.Scootertown.Data</PackageId>
     <RootNamespace>PDX.PBOT.Scootertown.Data</RootNamespace>
+    <Company>City of Portland</Company>
     <ApplicationIcon />
     <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="automapper" Version="7.0.1" />
-    <PackageReference Include="entityframework" Version="6.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="2.1.1" />
+    <PackageReference Include="nettopologysuite" Version="1.15.0" />
   </ItemGroup>
+  
 
 </Project>
