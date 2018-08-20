@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
@@ -8,6 +8,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "scootertown.data", "scootertown.data\scootertown.data.csproj", "{A652A1E6-2173-4D74-9F6D-C8609B923FF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "scootertown.integration", "scootertown.integration\scootertown.integration.csproj", "{27C2D334-AAD0-43EF-910B-65FA408FC184}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scootertown.data.test", "scootertown.data.test\scootertown.data.test.csproj", "{C59AACA8-C5AA-47FD-9257-078EB50EC207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
