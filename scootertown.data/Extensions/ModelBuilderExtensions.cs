@@ -1,40 +1,33 @@
-using System.Data.Entity;
+
 using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
 
 namespace PDX.PBOT.Scootertown.Data.Extensions
 {
     public static class ModelBuilderExtensions
     {
-        delegate void CalendarConfig(EntityTypeConfiguration<Calendar> calendar);
-        delegate void CompanyConfig(EntityTypeConfiguration<Company> company);
-        delegate void PaymentTypeConfig(EntityTypeConfiguration<PaymentType> paymentType);
-        delegate void PlacementReasonConfig(EntityTypeConfiguration<PlacementReason> placementReason);
-        delegate void RemovalReasonConfig(EntityTypeConfiguration<RemovalReason> removalReason);
-        delegate void VehicleTypeConfig(EntityTypeConfiguration<VehicleType> vehicleType);
-        delegate void VehicleConfig(EntityTypeConfiguration<Vehicle> vehicle);
-        delegate void CollisionConfig(EntityTypeConfiguration<Collision> collision);
-        delegate void ComplaintConfig(EntityTypeConfiguration<Complaint> complaint);
-        delegate void DeploymentConfig(EntityTypeConfiguration<Deployment> deployment);
-        delegate void TripConfig(EntityTypeConfiguration<Trip> trip);
-
-        private static EntityTypeConfiguration<TEntity> ToTable<TEntity>(this EntityTypeConfiguration<TEntity> entityTypeBuilder, TableConfiguration configuration)
+        private static EntityTypeBuilder<TEntity> ToTable<TEntity>(this EntityTypeBuilder<TEntity> entityTypeBuilder, TableConfiguration configuration)
             where TEntity : class
         {
             return string.IsNullOrWhiteSpace(configuration.Schema) ? entityTypeBuilder.ToTable(configuration.Name) : entityTypeBuilder.ToTable(configuration.Name, configuration.Schema);
         }
 
-        public static void ConfigureContext(this DbModelBuilder modelBuilder, VehicleStoreOptions storeOptions)
+        public static void ConfigureContext(this ModelBuilder modelBuilder, VehicleStoreOptions storeOptions)
         {
             if (!string.IsNullOrWhiteSpace(storeOptions.DefaultSchema)) modelBuilder.HasDefaultSchema(storeOptions.DefaultSchema);
-                        
-            CalendarConfig calendarConfig = (calendar) =>
+
+            modelBuilder.HasPostgresExtension("postgis");
+
+            modelBuilder.Entity<Calendar>(calendar =>
             {
                 calendar.ToTable(storeOptions.Calendar);
 
-                calendar.HasKey(x => x.DateKey);
+                calendar.HasKey(x => x.Key);
 
                 calendar.Property(x => x.Date).IsRequired().HasColumnType("Date");
                 calendar.Property(x => x.Day);
@@ -51,60 +44,77 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 calendar.Property(x => x.MMYYYY);
                 calendar.Property(x => x.MonthYear);
 
-                calendar.HasMany(x => x.Trips).WithRequired(x => x.StartDate);
-                calendar.HasMany(x => x.Trips).WithRequired(x => x.EndDate);
-            };
-            calendarConfig(modelBuilder.Entity<Calendar>());
+                calendar.HasIndex(x => x.Date).IsUnique();
 
-            VehicleConfig vehicleConfig = (vehicle) =>
+                calendar.HasMany(x => x.TripsStarted).WithOne(x => x.StartDate);
+                calendar.HasMany(x => x.TripsEnded).WithOne(x => x.EndDate);
+            });
+
+            modelBuilder.Entity<Company>(company =>
+            {
+                company.ToTable(storeOptions.Company);
+
+                company.HasKey(x => x.Key);
+
+                company.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+                company.HasIndex(x => x.Name).IsUnique();
+
+                company.HasMany(x => x.Vehicles).WithOne(x => x.Company);
+                company.HasMany(x => x.Trips).WithOne(x => x.Company);
+                company.HasMany(x => x.Deployments).WithOne(x => x.Company);
+            });
+
+            modelBuilder.Entity<PaymentType>(type =>
+            {
+                type.ToTable(storeOptions.PaymentType);
+
+                type.HasKey(x => x.Key);
+
+                type.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+                type.HasIndex(x => x.Name).IsUnique();
+
+                type.HasMany(x => x.TripsPayType).WithOne(x => x.PaymentType);
+                type.HasMany(x => x.TripsPayAccess).WithOne(x => x.PaymentAccess);
+            });
+
+            modelBuilder.Entity<PlacementReason>(reason =>
+            {
+                reason.ToTable(storeOptions.PlacementReason);
+
+                reason.HasKey(x => x.Key);
+
+                reason.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+                reason.HasIndex(x => x.Name).IsUnique();
+
+                reason.HasMany(x => x.Deployments).WithOne(x => x.PlacementReason);
+            });
+
+            modelBuilder.Entity<RemovalReason>(reason =>
+            {
+                reason.ToTable(storeOptions.RemovalReason);
+
+                reason.HasKey(x => x.Key);
+
+                reason.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+                reason.HasIndex(x => x.Name).IsUnique();
+
+                reason.HasMany(x => x.Deployments).WithOne(x => x.PickupReason);
+            });
+
+            modelBuilder.Entity<Vehicle>(vehicle =>
             {
                 vehicle.ToTable(storeOptions.Vehicle);
 
                 vehicle.HasKey(x => x.Key);
 
-                vehicle.Property(x => x.AlternateKey);
+                vehicle.Property(x => x.Name);
                 vehicle.Property(x => x.Registered);
-                vehicle.Property(x => x.Created);
-                vehicle.Property(x => x.Modified);
 
-                vehicle.HasIndex(x => x.AlternateKey).IsUnique();
-            };
-
-            vehicleConfig(modelBuilder.Entity<Vehicle>());
-
-            modelBuilder.Entity<VehicleBureau>(bureau => 
-            {
-                bureau.ToTable(storeOptions.VehicleBureau);
-
-                bureau.HasKey(x => x.Key);
-
-                bureau.Property(x => x.NavManKey);
-                bureau.Property(x => x.Name).HasMaxLength(200).IsRequired();
-                bureau.Property(x => x.Description).HasMaxLength(1000);
-                bureau.Property(x => x.Inactive).HasDefaultValue(false);
-
-                bureau.HasIndex(x => x.Name).IsUnique();
-                bureau.HasIndex(x => x.NavManKey).IsUnique();
-
-                bureau.HasMany(x => x.ChildGroups).WithOne(x => x.Bureau).OnDelete(DeleteBehavior.Restrict);
-                bureau.HasMany(x => x.Locations).WithOne(x => x.Bureau).OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<VehicleGroup>(group =>
-            {
-                group.ToTable(storeOptions.VehicleGroup);
-
-                group.HasKey(x => x.Key);
-
-                group.Property(x => x.NavManKey);
-                group.Property(x => x.Name).HasMaxLength(200).IsRequired();
-                group.Property(x => x.Description).HasMaxLength(1000);
-                
-                group.HasIndex(x => x.Name).IsUnique();
-                group.HasIndex(x => x.NavManKey).IsUnique();
-
-                group.HasMany(x => x.Children).WithOne(x => x.Parent).OnDelete(DeleteBehavior.Restrict);
-                group.HasMany(x => x.Locations).WithOne(x => x.Group).OnDelete(DeleteBehavior.Restrict);
+                vehicle.HasIndex(x => x.Name).IsUnique();
             });
 
             modelBuilder.Entity<VehicleType>(type =>
@@ -113,32 +123,171 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
 
                 type.HasKey(x => x.Key);
 
-                type.Property(x => x.NavManKey);
                 type.Property(x => x.Name).HasMaxLength(200).IsRequired();
-                type.Property(x => x.Description).HasMaxLength(1000);
-                
-                type.HasIndex(x => x.NavManKey).IsUnique();
 
-                type.HasMany(x => x.Locations).WithOne(x => x.Type).OnDelete(DeleteBehavior.Restrict);
+                type.HasIndex(x => x.Name).IsUnique();
+
+                type.HasMany(x => x.Trips).WithOne(x => x.VehicleType);
+                type.HasMany(x => x.Deployments).WithOne(x => x.VehicleType);
             });
 
-            
-
-            modelBuilder.Entity<VehicleLocation>(location =>
+            modelBuilder.Entity<Collision>(collision =>
             {
-                location.ToTable(storeOptions.VehicleLocation);
+                collision.ToTable(storeOptions.Collision);
 
-                location.HasKey( x => x.Key);
-
-                location.Property(x => x.Longitude).IsRequired();
-                location.Property(x => x.Latitude).IsRequired();
-                location.Property(x => x.Timestamp).IsRequired();
-                location.Property(x => x.Speed);
-                location.Property(x => x.Heading);
-                location.Property(x => x.Odometer);
-
-                location.HasOne(x => x.Date).WithMany(x => x.Locations).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                collision.HasKey(x => x.Key);
             });
+
+            modelBuilder.Entity<Complaint>(complaint =>
+            {
+                complaint.ToTable(storeOptions.Complaint);
+
+                complaint.HasKey(x => x.Key);
+            });
+
+            modelBuilder.Entity<Deployment>(deployment =>
+            {
+                deployment.ToTable(storeOptions.Deployment);
+
+                deployment.HasKey(x => x.Key);
+
+                deployment.Property(x => x.AlternateKey).HasMaxLength(50);
+                deployment.Property(x => x.StartTime);
+                deployment.Property(x => x.EndTime);
+                deployment.Property(x => x.FirstSeen);
+                deployment.Property(x => x.LastSeen);
+                deployment.Property(x => x.Location);
+                deployment.Property(x => x.InEastPortland);
+                deployment.Property(x => x.BatteryLevel);
+                deployment.Property(x => x.AllowedPlacement);
+                deployment.Property(x => x.Reserved);
+                deployment.Property(x => x.Disabled);
+
+                // Foreign keys
+                deployment.Property(x => x.VehicleKey);
+                deployment.Property(x => x.CompanyKey);
+                deployment.Property(x => x.VehicleTypeKey);
+                deployment.Property(x => x.StartDateKey);
+                deployment.Property(x => x.EndDateKey);
+                deployment.Property(x => x.PlacementReasonKey);
+                deployment.Property(x => x.PickupReasonKey);
+
+                // Indicies
+                deployment.HasIndex(x => new { x.VehicleKey, x.StartDateKey, x.StartTime }).IsUnique();
+
+                // Relationships
+                deployment.HasOne(x => x.Vehicle).WithMany(x => x.Deployments).HasForeignKey(x => x.VehicleKey);
+                deployment.HasOne(x => x.Company).WithMany(x => x.Deployments).HasForeignKey(x => x.CompanyKey);
+                deployment.HasOne(x => x.VehicleType).WithMany(x => x.Deployments).HasForeignKey(x => x.VehicleTypeKey);
+                deployment.HasOne(x => x.StartDate).WithMany(x => x.DeploymentsStarted).HasForeignKey(x => x.StartDateKey);
+                deployment.HasOne(x => x.EndDate).WithMany(x => x.DeploymentsEnded).HasForeignKey(x => x.EndDateKey);
+                deployment.HasOne(x => x.PlacementReason).WithMany(x => x.Deployments).HasForeignKey(x => x.PlacementReasonKey);
+                deployment.HasOne(x => x.PickupReason).WithMany(x => x.Deployments).HasForeignKey(x => x.PickupReasonKey);
+            });
+
+            modelBuilder.Entity<Trip>(trip =>
+            {
+                trip.ToTable(storeOptions.Trip);
+
+                trip.HasKey(x => x.Key);
+
+                // Original properties
+                trip.Property(x => x.AlternateKey).HasMaxLength(50).IsRequired();
+                trip.Property(x => x.StartTime);
+                trip.Property(x => x.EndTime);
+                trip.Property(x => x.StartPoint);
+                trip.Property(x => x.EndPoint);
+                trip.Property(x => x.Route);
+                trip.Property(x => x.Duration);
+                trip.Property(x => x.Distance);
+                trip.Property(x => x.Accuracy);
+                trip.Property(x => x.SampleRate);
+                trip.Property(x => x.MaxSpeed);
+                trip.Property(x => x.AverageSpeed);
+                trip.Property(x => x.StandardCost);
+                trip.Property(x => x.ActualCost);
+                trip.Property(x => x.ParkingVerification);
+
+                // Foreign keys
+                trip.Property(x => x.VehicleKey);
+                trip.Property(x => x.CompanyKey);
+                trip.Property(x => x.VehicleTypeKey);
+                trip.Property(x => x.StartDateKey);
+                trip.Property(x => x.EndDateKey);
+                trip.Property(x => x.PaymentTypeKey);
+                trip.Property(x => x.PaymentAccessKey);
+
+                // Indicies
+                trip.HasIndex(x => x.AlternateKey).IsUnique();
+                trip.HasIndex(x => new { x.VehicleKey, x.StartDateKey, x.StartTime }).IsUnique();
+
+                // Relationships
+                trip.HasOne(x => x.Company).WithMany(x => x.Trips).HasForeignKey(x => x.CompanyKey);
+                trip.HasOne(x => x.StartDate).WithMany(x => x.TripsStarted).HasForeignKey(x => x.StartDateKey);
+                trip.HasOne(x => x.EndDate).WithMany(x => x.TripsEnded).HasForeignKey(x => x.EndDateKey);
+                trip.HasOne(x => x.PaymentType).WithMany(x => x.TripsPayType).HasForeignKey(x => x.PaymentTypeKey);
+                trip.HasOne(x => x.PaymentAccess).WithMany(x => x.TripsPayAccess).HasForeignKey(x => x.PaymentAccessKey);
+                trip.HasOne(x => x.Vehicle).WithMany(x => x.Trips).HasForeignKey(x => x.VehicleKey);
+                trip.HasOne(x => x.VehicleType).WithMany(x => x.Trips).HasForeignKey(x => x.VehicleTypeKey);
+            });
+        }
+
+        public static void SeedData(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Company>().HasData(
+                new Company { Key = 1, Name = "Bird" },
+                new Company { Key = 2, Name = "Lime" },
+                new Company { Key = 3, Name = "Skip" },
+                new Company { Key = 4, Name = "CycleHops" }
+            );
+
+            modelBuilder.Entity<PaymentType>().HasData(
+                new PaymentType { Key = 1, Name = "Phone scan" },
+                new PaymentType { Key = 2, Name = "Phone text" }
+            );
+
+            modelBuilder.Entity<PlacementReason>().HasData(
+                new PlacementReason { Key = 1, Name = "User" },
+                new PlacementReason { Key = 2, Name = "Rebalancing" }
+            );
+
+            modelBuilder.Entity<RemovalReason>().HasData(
+                new RemovalReason { Key = 1, Name = "User" },
+                new RemovalReason { Key = 2, Name = "Rebalancing" },
+                new RemovalReason { Key = 3, Name = "Out of service area" },
+                new RemovalReason { Key = 4, Name = "Maintenance" }
+            );
+
+            modelBuilder.Entity<VehicleType>().HasData(
+                new VehicleType { Key = 1, Name = "Electric scooter" },
+                new VehicleType { Key = 2, Name = "Electric bicycle" },
+                new VehicleType { Key = 3, Name = "Scooter" },
+                new VehicleType { Key = 4, Name = "Bicycle" },
+                new VehicleType { Key = 5, Name = "None-Pedestrian" },
+                new VehicleType { Key = 6, Name = "Motor vehicle" },
+                new VehicleType { Key = 7, Name = "AV Motor vehicle" },
+                new VehicleType { Key = 8, Name = "TNC Private-for-hire vehicle" },
+                new VehicleType { Key = 9, Name = "AV Private-for-hire vehicle" },
+                new VehicleType { Key = 10, Name = "Taxi" },
+                new VehicleType { Key = 11, Name = "Pedicab" },
+                new VehicleType { Key = 12, Name = "Bus" },
+                new VehicleType { Key = 13, Name = "Motorcycle" },
+                new VehicleType { Key = 14, Name = "Personal Assisted Mobility Device" },
+                new VehicleType { Key = 15, Name = "Private or public agency transit vehicle" },
+                new VehicleType { Key = 16, Name = "Other" }
+            );
+
+            var calendars = new List<Calendar>();
+            var start = new DateTime(2018, 1, 1);
+            var end = new DateTime(2030, 12, 31);
+            for (int i = 0; i <= (end - start).Days; i++)
+            {
+                var day = start.AddDays(i);
+                var calendar = new Calendar(day);
+                calendar.Key = i + 1;
+                calendars.Add(calendar);
+            }
+            modelBuilder.Entity<Calendar>().HasData(calendars.ToArray());
         }
     }
 }
