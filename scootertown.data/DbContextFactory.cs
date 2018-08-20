@@ -1,35 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Concrete;
-using System.Data.Entity.Infrastructure;
 
 namespace PDX.PBOT.Scootertown.Data
 {
-    public class ScootertownDbContextFactory : IDbContextFactory<ScootertownDbContext>
+    public class ScootertownDbContextFactory : IDesignTimeDbContextFactory<ScootertownDbContext>
     {
-        private readonly DbContextOptions<ScootertownDbContext> ContextOptions;
-        private readonly VehicleStoreOptions StoreOptions;
-
-        public ScootertownDbContextFactory(DbContextOptions<ScootertownDbContext> options, VehicleStoreOptions storeOptions)
+        public ScootertownDbContext CreateDbContext(string[] args)
         {
-            ContextOptions = options;
-            StoreOptions = storeOptions;
-        }
+            var builder = new DbContextOptionsBuilder<ScootertownDbContext>();
+            builder.UseNpgsql(
+                @"Host=localhost;Database=scootertown;Username=scootertownadmin;Password=b43b25iun8fneufniosergigakei0r",
+                o => o.UseNetTopologySuite()
+            );
+            var options = builder.Options;
 
-        public ScootertownDbContext Create()
-        {
-            throw new NotImplementedException();
-        }
+            var context = new ScootertownDbContext(options, new VehicleStoreOptions());
 
-        public TDbContext CreateDbContext<TDbContext>() where TDbContext : class, IDbContext
-        {
-            var context = new ScootertownDbContext(ContextOptions, StoreOptions)as IDbContext;
-            return (TDbContext)context;
+            return context;
         }
     }
 }
