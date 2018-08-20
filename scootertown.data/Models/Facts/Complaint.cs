@@ -1,7 +1,6 @@
 namespace PDX.PBOT.Scootertown.Data.Models.Facts
 {
-    public class Complaint
+    public class Complaint : ModelBase
     {
-        
     }
 }
