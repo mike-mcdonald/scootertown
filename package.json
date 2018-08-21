@@ -4,11 +4,16 @@
   "description": "",
   "main": "trips.js",
   "dependencies": {
+    "@turf/turf": "^5.1.6",
+    "axios": "^0.18.0",
     "moment": "^2.22.2"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "download": "node trips.js > trips.json",
+    "stats": "node stats.js",
+    "run": "node trips.js > trips.json && node stats.js"
   },
   "author": "",
   "license": "ISC"
