@@ -21,8 +21,9 @@
 
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="Always" />
-    <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
-    <Content Include="eastportland.json" CopyToOutputDirectory="Always" />
+    <Content Include="../appsettings.json" CopyToOutputDirectory="Always" />
+    <Content Include="../eastportland.json" CopyToOutputDirectory="Always" />
+    <Content Include="../neighborhoods.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -32,6 +33,7 @@
     <AssemblyName>PDX.PBOT.Scootertown.Integration</AssemblyName>
     <PackageId>PDX.PBOT.Scootertown.Integration</PackageId>
     <RootNamespace>PDX.PBOT.Scootertown.Integration</RootNamespace>
+    <Company>City of Portland</Company>
   </PropertyGroup>
 
 </Project>
