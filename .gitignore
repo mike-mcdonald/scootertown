@@ -7,6 +7,17 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Secrets
+appsettings.json
+
+# Large files, noting where to download
+## npm run download
+trips.json
+## http://gis-pdx.opendata.arcgis.com/datasets/neighborhoods-regions
+neighborhoods.json
+## derived from above for now
+eastportland.json
+
 # User-specific files
 *.suo
 *.user
