@@ -15,6 +15,8 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
                     return new BirdManager(configuration);
                 case "Lime":
                     return new LimeManager(configuration);
+                case "Skip":
+                    return new SkipManager(configuration);
                 default:
                     throw new Exception($"No manager with name '{name}' found.");
             }
