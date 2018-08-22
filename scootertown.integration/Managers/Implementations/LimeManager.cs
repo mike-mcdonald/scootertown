@@ -56,23 +56,22 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<List<Models.TripDTO>> RetrieveTrips(long offset = 0)
         {
-            var totalTrips = new List<Models.Lime.TripDTO>();
-            var retrievedTrips = new List<Models.Lime.TripDTO>();
+            var trips = new List<Models.Lime.TripDTO>();
+            var page = Offset / 500;
 
-
-            do
+            var response = await Client.GetAsync($"trips?page={page}");
+            if (response.IsSuccessStatusCode)
             {
-                var response = await Client.GetAsync($"trips?page={Offset / 1000}");
-                if (response.IsSuccessStatusCode)
-                {
-                    var streamTask = await response.Content.ReadAsStringAsync();
-                    retrievedTrips = JsonConvert.DeserializeAnonymousType(streamTask, new { max_page = 1, data = new List<Models.Lime.TripDTO>() }).data;
-                    totalTrips.AddRange(retrievedTrips);
-                    Offset += 1;
-                }
-            } while (retrievedTrips.Count != 0);
+                var streamTask = await response.Content.ReadAsStringAsync();
+                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { max_page = 1, data = new List<Models.Lime.TripDTO>() }).data;
+                Offset += trips.Count;
+            }
+            else
+            {
+                throw new Exception($"Error retrieving trips for {CompanyName}");
+            }
 
-            return totalTrips.Select(t => Mapper.Map<Models.TripDTO>(t)).ToList();
+            return trips.Select(t => Mapper.Map<Models.TripDTO>(t)).ToList();
         }
     }
 }

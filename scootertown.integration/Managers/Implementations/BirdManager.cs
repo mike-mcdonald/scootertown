@@ -69,8 +69,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
         public override async Task<List<TripDTO>> RetrieveTrips(long offset = 0)
         {
             var limit = 500;
-            var totalTrips = new List<TripDTO>();
-            var retrievedTrips = new List<TripDTO>();
+            var trips = new List<TripDTO>();
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new SafeGeoJsonConverter());
@@ -79,16 +78,15 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                retrievedTrips = JsonConvert.DeserializeAnonymousType(streamTask, new { trips = new List<TripDTO>() }, settings).trips;
-                totalTrips.AddRange(retrievedTrips);
-                Offset += retrievedTrips.Count;
+                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { trips = new List<TripDTO>() }, settings).trips;
+                Offset += trips.Count;
             }
             else
             {
                 throw new Exception($"Error retrieving trips for {CompanyName}");
             }
 
-            return totalTrips;
+            return trips;
         }
     }
 }
