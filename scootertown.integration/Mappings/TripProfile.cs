@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Integration.Models;
+using PDX.PBOT.Scootertown.Integration.Models.Lime;
 using GeoJSON.Net;
 using Newtonsoft.Json;
 using NetTopologySuite.IO;
@@ -17,7 +18,7 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
     {
         public TripProfile() : base()
         {
-            CreateMap<TripDTO, Trip>()
+            CreateMap<Models.TripDTO, Trip>()
                 .ForMember(d => d.Key, opt => opt.Ignore())
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => GetTimeSpanFromTimestamp(s.StartTime)))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => GetTimeSpanFromTimestamp(s.EndTime)))
@@ -33,6 +34,9 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
                 .ForMember(d => d.EndDate, opt => opt.Ignore())
                 .ForMember(d => d.PaymentType, opt => opt.Ignore())
                 .ForMember(d => d.PaymentAccess, opt => opt.Ignore());
+
+            CreateMap<Models.Lime.TripDTO, Models.TripDTO>()
+                .ForMember(d => d.Route, opt => opt.MapFrom(s => (LineString)s.Route));
         }
     }
 }
