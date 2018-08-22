@@ -41,7 +41,8 @@ async function getLimeInfo(settings) {
     res = await axios.get(url, {
       params: {
         page,
-      }
+      },
+      headers: settings.Headers
     });
 
     trips = trips.concat(res.data.data);
@@ -57,12 +58,17 @@ async function getSkipInfo(settings) {
 
   const url = `${settings.BaseUrl}trips.json`;
 
-  let res = await axios.get(url);
+  let res = await axios.get(url, {
+    headers: settings.Headers
+  });
 
-  trips = trips.concat(res.data.reduce((accu, curr) => {
-    curr.start_point.coordinates = curr.start_point.coordinates.reverse();
-    accu.push(curr);
-  }, []));
+  trips = trips.concat(res.data.reduce(
+    (accu, curr) => {
+      curr.start_point.coordinates = curr.start_point.coordinates.reverse();
+      accu.push(curr);
+      return accu;
+    }, [])
+  );
 
   return trips;
 }
