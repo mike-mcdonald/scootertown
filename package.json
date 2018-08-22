@@ -11,9 +11,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "download": "node trips.js > trips.json",
+    "download": "node trips.js",
     "stats": "node stats.js",
-    "run": "node trips.js > trips.json && node stats.js"
+    "run": "node trips.js && node stats.js"
   },
   "author": "",
   "license": "ISC"
