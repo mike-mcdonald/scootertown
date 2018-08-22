@@ -66,6 +66,9 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     // Use automapper for the original properties
                     var deployment = Mapper.Map<Deployment>(item);
 
+                    // need the vehicle so we can test for active deployments
+                    deployment.VehicleKey = (await FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle })).Key;
+
                     // for this vehicle, is there an active deployment?
                     var currentDeployment = activeDeployments.FirstOrDefault(x => x.VehicleKey == deployment.VehicleKey);
                     if (currentDeployment != null)
@@ -91,7 +94,6 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         deployment.EndDateKey = item.EndTime.HasValue ? (await FindOrAddCalendar(item.EndTime.Value)).Key : (int?)null;
                         deployment.PlacementReasonKey = (await FindOrAdd<PlacementReason>(PlacementReasonRepository, item.PlacementReason, new PlacementReason { Key = item.PlacementReason })).Key;
                         deployment.PickupReasonKey = (await FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason })).Key;
-                        deployment.VehicleKey = (await FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle })).Key;
                         deployment.VehicleTypeKey = (await FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType })).Key;
 
                         deployment.InEastPortland = deployment.Location.Intersects(EastPortland);
