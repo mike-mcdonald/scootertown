@@ -57,7 +57,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
         public override async Task<List<Models.TripDTO>> RetrieveTrips(long offset = 0)
         {
             var trips = new List<Models.Lime.TripDTO>();
-            var page = Offset / 500;
+            var page = Offset / 500 + 1;
 
             var response = await Client.GetAsync($"trips?page={page}");
             if (response.IsSuccessStatusCode)
