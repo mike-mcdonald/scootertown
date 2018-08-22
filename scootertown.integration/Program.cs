@@ -31,6 +31,11 @@ namespace PDX.PBOT.Scootertown.Integration
             var pathToContentRoot = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var host = new HostBuilder()
+                /* set cwd to the path we are executing in since
+                 *  running 'dotnet run' would otherwise
+                 *  set cwd to the folder it is executing from
+                 *  and the json files we need are being copied to the output directory
+                 */
                 .UseContentRoot(pathToContentRoot)
                 .ConfigureAppConfiguration((context, builder) =>
                 {
@@ -45,9 +50,11 @@ namespace PDX.PBOT.Scootertown.Integration
                         cfg.AddProfile(typeof(TripProfile));
                     });
 
+                    // database table options
                     var storeOptions = new VehicleStoreOptions();
                     services.AddSingleton(storeOptions);
 
+                    // transient so I can create multiple services for each company
                     services
                         .AddEntityFrameworkNpgsql()
                         .AddDbContext<ScootertownDbContext>(options =>
