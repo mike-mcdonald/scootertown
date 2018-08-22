@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration.FileExtensions;
 using Microsoft.Extensions.Configuration.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PDX.PBOT.Scootertown.Integration.Infrastructure;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Models;
 
@@ -21,6 +22,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
         protected readonly string CompanyName;
         protected long Offset;
         protected readonly HttpClient Client;
+        protected readonly JsonSerializerSettings JsonSettings;
 
         public string Company
         {
@@ -48,6 +50,9 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             {
                 Client.DefaultRequestHeaders.Add(setting.Key, setting.Value);
             }
+
+            JsonSettings = new JsonSerializerSettings();
+            JsonSettings.Converters.Add(new SafeGeoJsonConverter());
         }
 
         public abstract Task<List<DeploymentDTO>> RetrieveAvailability();
