@@ -22,5 +22,10 @@ namespace PDX.PBOT.Scootertown.Integration.Models.Lime
             });
             return new LineString(coordinates.ToArray());
         }
+
+        public static implicit operator GeoJSON.Net.Geometry.LineString(LineStringDTO l)  // implicit digit to byte conversion operator
+        {
+            return l.Coordinates.Count > 1 ? new GeoJSON.Net.Geometry.LineString(l.Coordinates) : null;
+        }
     }
 }

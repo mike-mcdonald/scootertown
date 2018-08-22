@@ -1,3 +1,4 @@
+using GeoJSON.Net.Geometry;
 using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 
@@ -5,31 +6,22 @@ namespace PDX.PBOT.Scootertown.Integration.Models.Lime
 {
     public class PointDTO
     {
-        private readonly double x;
-        private readonly double y;
-
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
         [JsonProperty(PropertyName = "coordinates")]
         public double[] Coordinates { get; set; }
 
-        public PointDTO(Point p)
+        public PointDTO() { }
+
+        public static implicit operator NetTopologySuite.Geometries.Point(PointDTO l)  // implicit digit to byte conversion operator
         {
-            Type = "point";
-            x = p.X;
-            y = p.Y;
+            NetTopologySuite.Geometries.Point p = new NetTopologySuite.Geometries.Point(x: l.Coordinates[0], y: l.Coordinates[1]);
+            return p;  // implicit conversion
         }
 
-        public static explicit operator PointDTO(Point p)  // explicit byte to digit conversion operator
+        public static implicit operator GeoJSON.Net.Geometry.Point(PointDTO l)  // implicit digit to byte conversion operator
         {
-            PointDTO l = new PointDTO(p);  // explicit conversion
-            return l;
-        }
-
-        public static implicit operator Point(PointDTO l)  // implicit digit to byte conversion operator
-        {
-            Point p = new Point(x: l.Coordinates[0], y: l.Coordinates[1]);
-            System.Console.WriteLine("conversion occurred");
+            GeoJSON.Net.Geometry.Point p = new GeoJSON.Net.Geometry.Point(new Position(l.Coordinates[1], l.Coordinates[0]));
             return p;  // implicit conversion
         }
     }

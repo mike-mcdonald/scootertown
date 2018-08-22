@@ -8,6 +8,7 @@ using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Integration.Models;
 using PDX.PBOT.Scootertown.Integration.Models.Lime;
 using GeoJSON.Net;
+using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
@@ -22,7 +23,7 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
                 .ForMember(d => d.Key, opt => opt.Ignore())
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => GetTimeSpanFromTimestamp(s.StartTime)))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => GetTimeSpanFromTimestamp(s.EndTime)))
-                .ForMember(d => d.Location, opt => opt.MapFrom(s => ReadGeoJson<Point>(s.Location)))
+                .ForMember(d => d.Location, opt => opt.MapFrom(s => ReadGeoJson<NetTopologySuite.Geometries.Point>(s.Location)))
 
                 // Ignore references, we'll find them later
                 .ForMember(d => d.InEastPortland, opt => opt.Ignore())
@@ -35,7 +36,7 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
                 .ForMember(d => d.PickupReason, opt => opt.Ignore());
 
             CreateMap<Models.Lime.DeploymentDTO, Models.DeploymentDTO>()
-                .ForMember(d => d.Location, opt => opt.MapFrom(s => (Point)s.Location));
+                .ForMember(d => d.Location, opt => opt.MapFrom(s => (GeoJSON.Net.Geometry.Point)s.Location));
         }
     }
 }
