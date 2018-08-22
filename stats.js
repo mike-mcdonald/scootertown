@@ -19,22 +19,22 @@ trips = trips.reduce((accu, curr) => {
   ) {
     const key = `${curr.device_id}-${curr.start_time}`;
     accu[key] = curr;
-    // let intersections = turf.flattenReduce(neighborhoods, (previous, current) => {
-    //   if (turf.booleanContains(current, accu[key].start_point)) {
-    //     previous.start = current.properties.MAPLABEL;
-    //   }
-    //   if (turf.booleanContains(current, accu[key].end_point)) {
-    //     previous.end = current.properties.MAPLABEL;
-    //   }
-    //   return previous;
-    // }, {
-    //     start: {},
-    //     end: {}
-    //   });
+    let intersections = turf.flattenReduce(neighborhoods, (previous, current) => {
+      if (accu[key].start_point && turf.booleanContains(current, accu[key].start_point)) {
+        previous.start = current.properties.MAPLABEL;
+      }
+      if (accu[key].end_point && turf.booleanContains(current, accu[key].end_point)) {
+        previous.end = current.properties.MAPLABEL;
+      }
+      return previous;
+    }, {
+        start: {},
+        end: {}
+      });
 
-    // Object.keys(intersections).forEach((value) => {
-    //   accu[key][`neighborhood_${value}`] = intersections[value];
-    // });
+    Object.keys(intersections).forEach((value) => {
+      accu[key][`neighborhood_${value}`] = intersections[value];
+    });
   }
   return accu;
 }, {});
