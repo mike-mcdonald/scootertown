@@ -37,6 +37,10 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public Calendar StartDate { get; set; }
         public int EndDateKey { get; set; }
         public Calendar EndDate { get; set; }
+        public int? NeighborhoodStartKey { get; set; }
+        public Neighborhood NeighborhoodStart { get; set; }
+        public int? NeighborhoodEndKey { get; set; }
+        public Neighborhood NeighborhoodEnd { get; set; }
         public int PaymentTypeKey { get; set; }
         public PaymentType PaymentType { get; set; }
         public int PaymentAccessKey { get; set; }
