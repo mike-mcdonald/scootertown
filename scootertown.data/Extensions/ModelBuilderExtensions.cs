@@ -65,6 +65,23 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 company.HasMany(x => x.Deployments).WithOne(x => x.Company);
             });
 
+            modelBuilder.Entity<Neighborhood>(neighborhood =>
+            {
+                neighborhood.ToTable(storeOptions.Neighborhood);
+
+                neighborhood.HasKey(x => x.Key);
+
+                neighborhood.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                neighborhood.Property(x => x.AlternateKey).IsRequired();
+                neighborhood.Property(x => x.Geometry);
+
+                neighborhood.HasIndex(x => x.AlternateKey).IsUnique();
+                neighborhood.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
+
+                neighborhood.HasMany(x => x.TripsStarted).WithOne(x => x.NeighborhoodStart);
+                neighborhood.HasMany(x => x.TripsEnded).WithOne(x => x.NeighborhoodEnd);
+            });
+
             modelBuilder.Entity<PaymentType>(type =>
             {
                 type.ToTable(storeOptions.PaymentType);
@@ -171,9 +188,11 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 deployment.Property(x => x.EndDateKey);
                 deployment.Property(x => x.PlacementReasonKey);
                 deployment.Property(x => x.PickupReasonKey);
+                deployment.Property(x => x.NeighborhoodKey);
 
                 // Indicies
                 deployment.HasIndex(x => new { x.VehicleKey, x.StartDateKey, x.StartTime }).IsUnique();
+                deployment.HasIndex(x => x.Location);
 
                 // Relationships
                 deployment.HasOne(x => x.Vehicle).WithMany(x => x.Deployments).HasForeignKey(x => x.VehicleKey);
@@ -183,6 +202,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 deployment.HasOne(x => x.EndDate).WithMany(x => x.DeploymentsEnded).HasForeignKey(x => x.EndDateKey);
                 deployment.HasOne(x => x.PlacementReason).WithMany(x => x.Deployments).HasForeignKey(x => x.PlacementReasonKey);
                 deployment.HasOne(x => x.PickupReason).WithMany(x => x.Deployments).HasForeignKey(x => x.PickupReasonKey);
+                deployment.HasOne(x => x.Neighborhood).WithMany(x => x.Deployments).HasForeignKey(x => x.NeighborhoodKey);
             });
 
             modelBuilder.Entity<Trip>(trip =>
@@ -216,10 +236,16 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.Property(x => x.EndDateKey);
                 trip.Property(x => x.PaymentTypeKey);
                 trip.Property(x => x.PaymentAccessKey);
+                trip.Property(x => x.NeighborhoodStartKey);
+                trip.Property(x => x.NeighborhoodEndKey);
 
                 // Indicies
                 trip.HasIndex(x => x.AlternateKey).IsUnique();
                 trip.HasIndex(x => new { x.VehicleKey, x.StartDateKey, x.StartTime }).IsUnique();
+                trip.HasIndex(x => x.StartPoint);
+                trip.HasIndex(x => x.EndPoint);
+                // // gist is a bounding box index
+                trip.HasIndex(x => x.Route).ForNpgsqlHasMethod("gist");
 
                 // Relationships
                 trip.HasOne(x => x.Company).WithMany(x => x.Trips).HasForeignKey(x => x.CompanyKey);
@@ -229,6 +255,8 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.HasOne(x => x.PaymentAccess).WithMany(x => x.TripsPayAccess).HasForeignKey(x => x.PaymentAccessKey);
                 trip.HasOne(x => x.Vehicle).WithMany(x => x.Trips).HasForeignKey(x => x.VehicleKey);
                 trip.HasOne(x => x.VehicleType).WithMany(x => x.Trips).HasForeignKey(x => x.VehicleTypeKey);
+                trip.HasOne(x => x.NeighborhoodStart).WithMany(x => x.TripsStarted).HasForeignKey(x => x.NeighborhoodStartKey);
+                trip.HasOne(x => x.NeighborhoodEnd).WithMany(x => x.TripsEnded).HasForeignKey(x => x.NeighborhoodEndKey);
             });
         }
 
