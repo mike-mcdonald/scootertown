@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Integration.Managers;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
@@ -21,7 +22,11 @@ namespace PDX.PBOT.Scootertown.Integration
         private readonly List<ICompanyManager> Managers = new List<ICompanyManager>();
         private readonly Dictionary<string, bool> TripQueryLock = new Dictionary<string, bool>();
 
-        public Host(IConfiguration configuration, ILogger<Host> logger, IServiceProvider serviceProvider)
+        public Host(
+            IConfiguration configuration,
+            ILogger<Host> logger,
+            IServiceProvider serviceProvider
+        )
         {
             Logger = logger;
             ServiceProvider = serviceProvider;
@@ -40,11 +45,25 @@ namespace PDX.PBOT.Scootertown.Integration
         {
             Logger.LogInformation("Starting.");
 
+            Logger.LogDebug("Reading neighborhoods...");
+            try
+            {
+                await ServiceProvider.GetRequiredService<INeighborhoodService>().Save();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Caught exception reading neighborhoodes data:\n{message}", e.Message);
+            }
+
+            // set up the offsets to pick up where we left off
             foreach (var manager in Managers)
             {
                 var tripService = ServiceProvider.GetRequiredService<ITripService>();
                 manager.StartingOffset = await tripService.GetTotalTrips(manager.Company);
             }
+
+            // set up the neighborhoods
+
 
             deploymentTimer = new Timer(obj =>
             {

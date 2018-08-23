@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
 using NLog.Extensions.Logging;
 using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Options;
@@ -24,8 +24,6 @@ namespace PDX.PBOT.Scootertown.Integration
 {
     class Program
     {
-        private static List<ICompanyManager> Managers = new List<ICompanyManager>();
-
         static async Task Main(string[] args)
         {
             var pathToContentRoot = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -37,7 +35,7 @@ namespace PDX.PBOT.Scootertown.Integration
                  *  and the json files we need are being copied to the output directory
                  */
                 .UseContentRoot(pathToContentRoot)
-                .ConfigureAppConfiguration((context, builder) =>
+                .ConfigureHostConfiguration((builder) =>
                 {
                     builder.AddJsonFile("appsettings.json");
                 })
@@ -48,6 +46,7 @@ namespace PDX.PBOT.Scootertown.Integration
                     {
                         cfg.AddProfile(typeof(DeploymentProfile));
                         cfg.AddProfile(typeof(TripProfile));
+                        cfg.AddProfile(typeof(GeoJsonProfile));
                     });
 
                     // database table options
@@ -74,7 +73,11 @@ namespace PDX.PBOT.Scootertown.Integration
 
                     // larger dimension repositories don't to save memory
                     services.AddTransient<ICalendarRepository, CalendarRepository>();
+                    services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
                     services.AddTransient<IVehicleRepository, VehicleRepository>();
+
+                    // add generic services for repositories for any geojson we'll read in
+                    services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
 
                     // fact repositories 
                     services.AddTransient<ITripRepository, TripRepository>();
@@ -82,18 +85,11 @@ namespace PDX.PBOT.Scootertown.Integration
 
                     services.AddTransient<ITripService, TripService>();
                     services.AddTransient<IDeploymentService, DeploymentService>();
+                    services.AddTransient<INeighborhoodService, NeighborhoodService>();
 
                     services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
                     services.AddSingleton<IHostedService, Host>();
-
-                    GeoJsonReader reader = new GeoJsonReader();
-                    var area = reader.Read<Polygon>(
-                        File.ReadAllText(
-                            Path.Combine(context.HostingEnvironment.ContentRootPath, "eastportland.json")
-                        )
-                    );
-                    services.AddSingleton(area);
                 })
                 .ConfigureLogging((context, logging) =>
                 {
@@ -102,6 +98,9 @@ namespace PDX.PBOT.Scootertown.Integration
                     logging.AddNLog();
 
                     NLog.LogManager.LoadConfiguration("nlog.config");
+                })
+                .ConfigureAppConfiguration((context, builder) =>
+                {
                 });
             await host.RunConsoleAsync();
         }
