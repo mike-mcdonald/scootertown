@@ -22,6 +22,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
         private readonly ILogger Logger;
         private readonly IDeploymentRepository DeploymentRepository;
         private readonly ICompanyRepository CompanyRepository;
+        private readonly INeighborhoodRepository NeighborhoodRepository;
         private readonly IPlacementReasonRepository PlacementReasonRepository;
         private readonly IRemovalReasonRepository RemovalReasonRepository;
         private readonly IVehicleRepository VehicleRepository;
@@ -34,22 +35,21 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             IDeploymentRepository deploymentRepository,
             ICalendarRepository calendarRepository,
             ICompanyRepository companyRepository,
+            INeighborhoodRepository neighborhoodRepository,
             IPlacementReasonRepository placementReasonRepository,
             IRemovalReasonRepository removalReasonRepository,
             IVehicleRepository vehicleRepository,
-            IVehicleTypeRepository vehicleTypeRepository,
-            Polygon eastPortland
+            IVehicleTypeRepository vehicleTypeRepository
         ) : base(calendarRepository)
         {
             Logger = logger;
             DeploymentRepository = deploymentRepository;
             CompanyRepository = companyRepository;
+            NeighborhoodRepository = neighborhoodRepository;
             PlacementReasonRepository = placementReasonRepository;
             RemovalReasonRepository = removalReasonRepository;
             VehicleRepository = vehicleRepository;
             VehicleTypeRepository = vehicleTypeRepository;
-
-            EastPortland = eastPortland;
         }
 
         public override async Task Save(List<DeploymentDTO> items)
@@ -96,7 +96,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         deployment.PickupReasonKey = (await FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason })).Key;
                         deployment.VehicleTypeKey = (await FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType })).Key;
 
-                        deployment.InEastPortland = deployment.Location.Intersects(EastPortland);
+                        deployment.NeighborhoodKey = (await NeighborhoodRepository.Find(deployment.Location))?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;
                         await DeploymentRepository.Add(deployment, false);
