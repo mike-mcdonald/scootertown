@@ -17,6 +17,7 @@ using PDX.PBOT.Scootertown.Data.Repositories.Implementations;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Mappings;
+using PDX.PBOT.Scootertown.Integration.Options;
 using PDX.PBOT.Scootertown.Integration.Services.Implementations;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
 
@@ -47,6 +48,14 @@ namespace PDX.PBOT.Scootertown.Integration
                         cfg.AddProfile(typeof(DeploymentProfile));
                         cfg.AddProfile(typeof(TripProfile));
                         cfg.AddProfile(typeof(GeoJsonProfile));
+                    });
+
+                    services.Configure<AreasOfInterest>(config =>
+                    {
+                        config.NeighborhoodsFile = Path.Combine(
+                            context.HostingEnvironment.ContentRootPath,
+                            context.Configuration.GetValue<string>("NeighborhoodsFile")
+                        );
                     });
 
                     // database table options
