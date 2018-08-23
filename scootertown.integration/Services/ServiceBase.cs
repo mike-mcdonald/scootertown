@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using AutoMapper;
+using GeoJSON.Net.Feature;
+using GeoJSON.Net.Geometry;
+using Newtonsoft.Json;
 using PDX.PBOT.Scootertown.Data.Models;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
@@ -18,6 +23,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services
         {
             CalendarRepository = calendarRepository;
         }
+
         public abstract Task Save(List<TSource> items);
 
         protected async Task<Calendar> FindOrAddCalendar(long timestamp)
@@ -60,6 +66,22 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             }
 
             return dbItem;
+        }
+
+        protected List<TDest> ReadGeoJsonFile<TGeometry>(string fileName)
+            where TGeometry : IGeometryObject
+        {
+            var collection = JsonConvert.DeserializeObject<FeatureCollection>(
+                File.ReadAllText(fileName)
+            );
+
+            var list = new List<TDest>();
+            foreach (var feature in collection.Features)
+            {
+                var item = Mapper.Map<TDest>(feature);
+                list.Add(item);
+            }
+            return list;
         }
     }
 }
