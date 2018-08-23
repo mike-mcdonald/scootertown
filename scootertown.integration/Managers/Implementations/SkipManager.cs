@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using GeoJSON.Net.Geometry;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using PDX.PBOT.Scootertown.Integration.Infrastructure;
 using PDX.PBOT.Scootertown.Integration.Models;
 
 namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
@@ -69,31 +71,43 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync($"trips.json");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var trips = JsonConvert.DeserializeObject<List<TripDTO>>(streamTask, JsonSettings);
-                trips.ForEach(trip =>
+                var stream = await response.Content.ReadAsStreamAsync();
+                var reader = new JsonTextReader(new StreamReader(stream));
+                var serializer = new JsonSerializer();
+                serializer.Converters.Add(new SafeGeoJsonConverter());
+                try
                 {
-                    // flip the coordinates
-                    trip.StartPoint = new Point(new Position(
-                        trip.StartPoint.Coordinates.Longitude,
-                        trip.StartPoint.Coordinates.Latitude
-                    ));
-
-                    trip.EndPoint = new Point(new Position(
-                        trip.StartPoint.Coordinates.Longitude,
-                        trip.StartPoint.Coordinates.Latitude
-                    ));
-
-                    var route = new List<IPosition>();
-                    trip.Route.Coordinates.ToAsyncEnumerable().ForEach(position =>
+                    var trips = serializer.Deserialize<List<TripDTO>>(reader);
+                    trips.ForEach(trip =>
                     {
-                        route.Add(new Position(
-                            position.Longitude,
-                            position.Latitude
+                        // flip the coordinates
+                        trip.StartPoint = new Point(new Position(
+                                trip.StartPoint.Coordinates.Longitude,
+                                trip.StartPoint.Coordinates.Latitude
+                            ));
+
+                        trip.EndPoint = new Point(new Position(
+                            trip.StartPoint.Coordinates.Longitude,
+                            trip.StartPoint.Coordinates.Latitude
                         ));
+
+                        var route = new List<IPosition>();
+                        trip.Route.Coordinates.ToAsyncEnumerable().ForEach(position =>
+                        {
+                            route.Add(new Position(
+                                position.Longitude,
+                                position.Latitude
+                            ));
+                        });
+                        trip.Route = new LineString(route);
                     });
-                    trip.Route = new LineString(route);
-                });
+
+                    return trips;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Error retrieving trips for {CompanyName}:\n{e.Message}");
+                }
             }
 
             throw new Exception($"Error retrieving trips for {CompanyName}");
