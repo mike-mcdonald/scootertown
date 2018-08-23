@@ -14,6 +14,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
     {
         private readonly ITripRepository TripRepository;
         private readonly ICompanyRepository CompanyRepository;
+        private readonly INeighborhoodRepository NeighborhoodRepository;
         private readonly IPaymentTypeRepository PaymentTypeRepository;
         private readonly IVehicleRepository VehicleRepository;
         private readonly IVehicleTypeRepository VehicleTypeRepository;
@@ -24,7 +25,8 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             ICompanyRepository companyRepository,
             IPaymentTypeRepository paymentTypeRepository,
             IVehicleRepository vehicleRepository,
-            IVehicleTypeRepository vehicleTypeRepository
+            IVehicleTypeRepository vehicleTypeRepository,
+            INeighborhoodRepository neighborhoodRepository
         ) : base(calendarRepository)
         {
             TripRepository = tripRepository;
@@ -32,6 +34,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             PaymentTypeRepository = paymentTypeRepository;
             VehicleRepository = vehicleRepository;
             VehicleTypeRepository = vehicleTypeRepository;
+            NeighborhoodRepository = neighborhoodRepository;
         }
 
         public async Task<long> GetTotalTrips(string companyName) => await CompanyRepository.GetTripCount(companyName);
@@ -55,6 +58,9 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     trip.VehicleTypeKey = (await FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType })).Key;
                     trip.PaymentTypeKey = (await FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentType, new PaymentType { Key = item.PaymentType })).Key;
                     trip.PaymentAccessKey = (await FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentAccess, new PaymentType { Key = item.PaymentAccess })).Key;
+
+                    trip.NeighborhoodStartKey = (await NeighborhoodRepository.Find(trip.StartPoint))?.Key;
+                    trip.NeighborhoodEndKey = (await NeighborhoodRepository.Find(trip.EndPoint))?.Key;
 
                     // add it to the database
                     await TripRepository.Add(trip);
