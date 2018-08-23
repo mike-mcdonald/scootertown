@@ -21,6 +21,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
         public readonly DeploymentRepository DeploymentRepository;
         public readonly CalendarRepository CalendarRepository;
         public readonly CompanyRepository CompanyRepository;
+        public readonly NeighborhoodRepository NeighborhoodRepository;
         public readonly PlacementReasonRepository PlacementReasonRepository;
         public readonly RemovalReasonRepository RemovalReasonRepository;
         public readonly VehicleRepository VehicleRepository;
@@ -44,24 +45,22 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
             DeploymentRepository = new DeploymentRepository(context);
             CalendarRepository = new CalendarRepository(context);
             CompanyRepository = new CompanyRepository(context);
+            NeighborhoodRepository = new NeighborhoodRepository(context);
             PlacementReasonRepository = new PlacementReasonRepository(context);
             RemovalReasonRepository = new RemovalReasonRepository(context);
             VehicleRepository = new VehicleRepository(context);
             VehicleTypeRepository = new VehicleTypeRepository(context);
-
-            GeoJsonReader reader = new GeoJsonReader();
-            var area = reader.Read<Polygon>(File.ReadAllText("eastportland.json"));
 
             DeploymentService = new DeploymentService(
                 new Mock<ILogger<DeploymentService>>().Object,
                 DeploymentRepository,
                 CalendarRepository,
                 CompanyRepository,
+                NeighborhoodRepository,
                 PlacementReasonRepository,
                 RemovalReasonRepository,
                 VehicleRepository,
-                VehicleTypeRepository,
-                area
+                VehicleTypeRepository
             );
         }
 
