@@ -62,9 +62,6 @@ namespace PDX.PBOT.Scootertown.Integration
                 manager.StartingOffset = await tripService.GetTotalTrips(manager.Company);
             }
 
-            // set up the neighborhoods
-
-
             deploymentTimer = new Timer(obj =>
             {
                 foreach (var manager in Managers)
