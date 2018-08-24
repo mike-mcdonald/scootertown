@@ -41,31 +41,43 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public override async Task Save(Queue<TripDTO> items)
         {
-            var trips = new List<Trip>();
-
-            foreach (var item in items)
+            while (items.Count > 0)
             {
-                if (TripRepository.Find(item.AlternateKey) != null)
-                {
-                    // Use automapper for the original properties
-                    var trip = Mapper.Map<Trip>(item);
+                var item = items.Dequeue();
 
-                    // Get the reference properties set up
-                    trip.CompanyKey = (await FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company })).Key;
-                    trip.StartDateKey = (await FindOrAddCalendar(item.StartTime)).Key;
-                    trip.EndDateKey = (await FindOrAddCalendar(item.EndTime)).Key;
-                    trip.VehicleKey = (await FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle })).Key;
-                    trip.VehicleTypeKey = (await FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType })).Key;
-                    trip.PaymentTypeKey = (await FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentType, new PaymentType { Key = item.PaymentType })).Key;
-                    trip.PaymentAccessKey = (await FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentAccess, new PaymentType { Key = item.PaymentAccess })).Key;
+                var existingTask = TripRepository.Find(item.AlternateKey);
 
-                    trip.NeighborhoodStartKey = (await NeighborhoodRepository.Find(trip.StartPoint))?.Key;
-                    trip.NeighborhoodEndKey = (await NeighborhoodRepository.Find(trip.EndPoint))?.Key;
+                // Get the reference properties set up
+                var companyTask = FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company });
+                var startDateTask = FindOrAddCalendar(item.StartTime);
+                var endDateTask = FindOrAddCalendar(item.EndTime);
+                var vehicleTask = FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle });
+                var vehicleTypeTask = FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType });
+                var paymentTypeTask = FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentType, new PaymentType { Key = item.PaymentType });
+                var paymentAccessTask = FindOrAdd<PaymentType>(PaymentTypeRepository, item.PaymentAccess, new PaymentType { Key = item.PaymentAccess });
 
-                    // add it to the database
-                    await TripRepository.Add(trip);
-                }
+                var existing = await existingTask;
+                var trip = existing ?? Mapper.Map<Trip>(item);
+                
+                var neighborhoodStartTask = NeighborhoodRepository.Find(trip.StartPoint);
+                var neighborhoodEndTask = NeighborhoodRepository.Find(trip.EndPoint);
+
+                trip.CompanyKey = (await companyTask).Key;
+                trip.StartDateKey = (await startDateTask).Key;
+                trip.EndDateKey = (await endDateTask).Key;
+                trip.VehicleKey = (await vehicleTask).Key;
+                trip.VehicleTypeKey = (await vehicleTypeTask).Key;
+                trip.PaymentTypeKey = (await paymentTypeTask).Key;
+                trip.PaymentAccessKey = (await paymentAccessTask).Key;
+
+                trip.NeighborhoodStartKey = (await neighborhoodStartTask)?.Key;
+                trip.NeighborhoodEndKey = (await neighborhoodEndTask)?.Key;
+
+                // add it to the database
+                await existing == null ? TripRepository.Add(trip, false) : TripRepository.Update(trip, false);
             }
+
+            await TripRepository.SaveChanges();
         }
     }
 }

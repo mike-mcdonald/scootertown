@@ -57,9 +57,10 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             var now = DateTime.Now.ToUniversalTime();
 
             // get all the active deployments
-            var activeDeployments = await DeploymentRepository.GetActive();
+            var activeDeploymentsTask = DeploymentRepository.GetActive();
 
-            foreach (var item in items)
+            DeploymentDTO item;
+            while (items.TryDequeue(out item))
             {
                 try
                 {
@@ -89,14 +90,27 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         Logger.LogTrace("Creating new deployment record for vehicle {key}", deployment.VehicleKey);
 
                         // Get the reference properties set up
-                        deployment.CompanyKey = (await FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company })).Key;
-                        deployment.StartDateKey = (await FindOrAddCalendar(item.StartTime)).Key;
-                        deployment.EndDateKey = item.EndTime.HasValue ? (await FindOrAddCalendar(item.EndTime.Value)).Key : (int?)null;
-                        deployment.PlacementReasonKey = (await FindOrAdd<PlacementReason>(PlacementReasonRepository, item.PlacementReason, new PlacementReason { Key = item.PlacementReason })).Key;
-                        deployment.PickupReasonKey = (await FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason })).Key;
-                        deployment.VehicleTypeKey = (await FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType })).Key;
+                        var companyTask = FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company });
+                        var startDateTask = FindOrAddCalendar(item.StartTime);
+                        var endDateTask = FindOrAddCalendar(item.EndTime);
+                        var vehicleTypeTask = FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType });
+                        var placementReasonTask = FindOrAdd<PlacementReason>(PlacementReasonRepository, item.PlacementReason, new PlacementReason { Key = item.PlacementReason });
+                        var pickupReasonTask = FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason });
 
-                        deployment.NeighborhoodKey = (await NeighborhoodRepository.Find(deployment.Location))?.Key;
+                        var existing = await existingTask;
+                        var deployment = existing ?? Mapper.Map<Deployment>(item);
+
+                        var neighborhoodTask = NeighborhoodRepository.Find(deployment.Location);
+
+                        deployment.CompanyKey = (await companyTask).Key;
+                        deployment.StartDateKey = (await startDateTask).Key;
+                        deployment.EndDateKey = (await endDateTask)?.Key;
+                        deployment.VehicleKey = (await vehicleTask).Key;
+                        deployment.VehicleTypeKey = (await vehicleTypeTask).Key;
+                        deployment.PlacementReasonKey = (await placementReasonTask).Key;
+                        deployment.PickupReasonKey = (await pickupReasonTask).Key;
+
+                        deployment.NeighborhoodKey = (await neighborhoodTask)?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;
                         await DeploymentRepository.Add(deployment, false);
