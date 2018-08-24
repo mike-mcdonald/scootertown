@@ -52,7 +52,7 @@ namespace PDX.PBOT.Scootertown.Integration
             }
             catch (Exception e)
             {
-                Logger.LogError("Caught exception reading neighborhoodes data:\n{message}", e.Message);
+                Logger.LogError("Caught exception reading neighborhoodes data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
             }
 
             // set up the offsets to pick up where we left off
@@ -76,7 +76,7 @@ namespace PDX.PBOT.Scootertown.Integration
 
                             var deployments = await manager.RetrieveAvailability();
 
-                            Logger.LogDebug("Writing {count} availability records.", deployments.Count);
+                            Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
 
                             await deploymentService.Save(deployments);
 
@@ -109,7 +109,7 @@ namespace PDX.PBOT.Scootertown.Integration
 
                                     var trips = await manager.RetrieveTrips();
 
-                                    Logger.LogDebug("Writing {count} trip records.", trips.Count);
+                                    Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 
                                     await tripService.Save(trips);
 
