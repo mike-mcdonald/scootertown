@@ -8,9 +8,9 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Interfaces
     {
         string Company { get; }
         long StartingOffset { set; }
-        Task<List<DeploymentDTO>> RetrieveAvailability();
-        Task<List<TripDTO>> RetrieveTrips(long offset = 0);
-        Task<List<CollisionDTO>> RetrieveCollisions();
-        Task<List<ComplaintDTO>> RetrieveComplaints();
+        Task<Queue<DeploymentDTO>> RetrieveAvailability();
+        Task<Queue<TripDTO>> RetrieveTrips(long offset = 0);
+        Task<Queue<CollisionDTO>> RetrieveCollisions();
+        Task<Queue<ComplaintDTO>> RetrieveComplaints();
     }
 }
