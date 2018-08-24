@@ -39,7 +39,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public async Task<long> GetTotalTrips(string companyName) => await CompanyRepository.GetTripCount(companyName);
 
-        public override async Task Save(List<TripDTO> items)
+        public override async Task Save(Queue<TripDTO> items)
         {
             var trips = new List<Trip>();
 

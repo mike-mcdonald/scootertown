@@ -55,9 +55,9 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             JsonSettings.Converters.Add(new SafeGeoJsonConverter());
         }
 
-        public abstract Task<List<DeploymentDTO>> RetrieveAvailability();
-        public abstract Task<List<CollisionDTO>> RetrieveCollisions();
-        public abstract Task<List<ComplaintDTO>> RetrieveComplaints();
-        public abstract Task<List<TripDTO>> RetrieveTrips(long offset);
+        public abstract Task<Queue<DeploymentDTO>> RetrieveAvailability();
+        public abstract Task<Queue<CollisionDTO>> RetrieveCollisions();
+        public abstract Task<Queue<ComplaintDTO>> RetrieveComplaints();
+        public abstract Task<Queue<TripDTO>> RetrieveTrips(long offset);
     }
 }

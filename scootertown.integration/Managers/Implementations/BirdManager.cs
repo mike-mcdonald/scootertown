@@ -14,7 +14,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
     {
         public BirdManager(IConfigurationSection configuration) : base("Bird", configuration) { }
 
-        public override async Task<List<DeploymentDTO>> RetrieveAvailability()
+        public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
         {
             var limit = 500;
             var offset = 0;
@@ -37,39 +37,39 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 }
             } while (retrievedAvailability.Count != 0);
 
-            return totalAvailability;
+            return new Queue<DeploymentDTO>(totalAvailability);
         }
 
-        public override async Task<List<CollisionDTO>> RetrieveCollisions()
+        public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
             var response = await Client.GetAsync("collisions");
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = response.Content.ReadAsStringAsync();
-                var collisions = JsonConvert.DeserializeAnonymousType(await streamTask, new { collisions = new List<CollisionDTO>() }).collisions;
+                var collisions = JsonConvert.DeserializeAnonymousType(await streamTask, new { collisions = new Queue<CollisionDTO>() }).collisions;
                 return collisions;
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<List<ComplaintDTO>> RetrieveComplaints()
+        public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()
         {
             var response = await Client.GetAsync("complaints");
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = response.Content.ReadAsStringAsync();
-                var complaints = JsonConvert.DeserializeAnonymousType(await streamTask, new { complaints = new List<ComplaintDTO>() }).complaints;
+                var complaints = JsonConvert.DeserializeAnonymousType(await streamTask, new { complaints = new Queue<ComplaintDTO>() }).complaints;
                 return complaints;
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<List<TripDTO>> RetrieveTrips(long offset = 0)
+        public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
         {
             var limit = 500;
-            var trips = new List<TripDTO>();
+            var trips = new Queue<TripDTO>();
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new SafeGeoJsonConverter());
@@ -78,7 +78,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { trips = new List<TripDTO>() }, settings).trips;
+                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { trips = new Queue<TripDTO>() }, settings).trips;
                 Offset += trips.Count;
             }
             else

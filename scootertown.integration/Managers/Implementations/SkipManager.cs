@@ -16,7 +16,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
     {
         public SkipManager(IConfigurationSection configuration) : base("Skip", configuration) { }
 
-        public override async Task<List<DeploymentDTO>> RetrieveAvailability()
+        public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
         {
             var response = await Client.GetAsync("availability.json");
             if (response.IsSuccessStatusCode)
@@ -31,13 +31,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                         deployment.Location.Coordinates.Latitude
                     ));
                 });
-                return availability;
+                return new Queue<DeploymentDTO>(availability);
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<List<CollisionDTO>> RetrieveCollisions()
+        public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
             var builder = new UriBuilder("collisions.json");
             string url = builder.ToString();
@@ -46,27 +46,27 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                var collisions = JsonConvert.DeserializeObject<List<CollisionDTO>>(streamTask, JsonSettings);
+                var collisions = JsonConvert.DeserializeObject<Queue<CollisionDTO>>(streamTask, JsonSettings);
                 return collisions;
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<List<ComplaintDTO>> RetrieveComplaints()
+        public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()
         {
             var response = await Client.GetAsync("complaints.json");
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                var complaints = JsonConvert.DeserializeObject<List<ComplaintDTO>>(streamTask, JsonSettings);
+                var complaints = JsonConvert.DeserializeObject<Queue<ComplaintDTO>>(streamTask, JsonSettings);
                 return complaints;
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<List<TripDTO>> RetrieveTrips(long offset = 0)
+        public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
         {
             var response = await Client.GetAsync($"trips.json");
             if (response.IsSuccessStatusCode)
@@ -102,7 +102,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                         trip.Route = new LineString(route);
                     });
 
-                    return trips;
+                    return new Queue<TripDTO>(trips);
                 }
                 catch (Exception e)
                 {

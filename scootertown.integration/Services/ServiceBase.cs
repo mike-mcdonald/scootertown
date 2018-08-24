@@ -24,11 +24,16 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             CalendarRepository = calendarRepository;
         }
 
-        public abstract Task Save(List<TSource> items);
+        public abstract Task Save(Queue<TSource> items);
 
-        protected async Task<Calendar> FindOrAddCalendar(long timestamp)
+        protected async Task<Calendar> FindOrAddCalendar(long? timestamp)
         {
-            System.DateTime date = (new DateTime()).FromUnixTimestamp(timestamp);
+            if (!timestamp.HasValue)
+            {
+                return null;
+            }
+            
+            System.DateTime date = (new DateTime()).FromUnixTimestamp(timestamp.Value);
             return await FindOrAddCalendar(date);
         }
 
@@ -68,20 +73,20 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             return dbItem;
         }
 
-        protected List<TDest> ReadGeoJsonFile<TGeometry>(string fileName)
+        protected Queue<TDest> ReadGeoJsonFile<TGeometry>(string fileName)
             where TGeometry : IGeometryObject
         {
             var collection = JsonConvert.DeserializeObject<FeatureCollection>(
                 File.ReadAllText(fileName)
             );
 
-            var list = new List<TDest>();
+            var queue = new Queue<TDest>();
             foreach (var feature in collection.Features)
             {
                 var item = Mapper.Map<TDest>(feature);
-                list.Add(item);
+                queue.Enqueue(item);
             }
-            return list;
+            return queue;
         }
     }
 }

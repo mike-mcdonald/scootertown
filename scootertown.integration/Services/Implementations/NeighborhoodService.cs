@@ -31,7 +31,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
         public async Task Save() =>
             await Save(ReadGeoJsonFile<Polygon>(AreasOfInterest.NeighborhoodsFile));
 
-        public override async Task Save(List<Neighborhood> neighborhoods)
+        public override async Task Save(Queue<Neighborhood> neighborhoods)
         {
             foreach (var neighborhood in neighborhoods)
             {

@@ -52,7 +52,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             VehicleTypeRepository = vehicleTypeRepository;
         }
 
-        public override async Task Save(List<DeploymentDTO> items)
+        public override async Task Save(Queue<DeploymentDTO> items)
         {
             var now = DateTime.Now.ToUniversalTime();
 
