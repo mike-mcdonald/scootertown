@@ -22,7 +22,7 @@ namespace PDX.PBOT.Scootertown.Data
             );
             var options = builder.Options;
 
-            var context = new ScootertownDbContext(options, new VehicleStoreOptions());
+            var context = new ScootertownDbContext(new ILogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
 
             return context;
         }

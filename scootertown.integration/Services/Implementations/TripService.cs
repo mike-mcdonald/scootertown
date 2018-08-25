@@ -74,7 +74,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                 trip.NeighborhoodEndKey = (await neighborhoodEndTask)?.Key;
 
                 // add it to the database
-                await existing == null ? TripRepository.Add(trip, false) : TripRepository.Update(trip, false);
+                var t = existing == null ? await TripRepository.Add(trip, false) : await TripRepository.Update(trip, false);
             }
 
             await TripRepository.SaveChanges();

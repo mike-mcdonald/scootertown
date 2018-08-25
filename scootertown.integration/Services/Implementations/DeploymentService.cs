@@ -57,7 +57,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             var now = DateTime.Now.ToUniversalTime();
 
             // get all the active deployments
-            var activeDeploymentsTask = DeploymentRepository.GetActive();
+            var activeDeployments = await DeploymentRepository.GetActive();
 
             DeploymentDTO item;
             while (items.TryDequeue(out item))
@@ -93,13 +93,10 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         var companyTask = FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company });
                         var startDateTask = FindOrAddCalendar(item.StartTime);
                         var endDateTask = FindOrAddCalendar(item.EndTime);
+                        var vehicleTask = FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle });
                         var vehicleTypeTask = FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType });
                         var placementReasonTask = FindOrAdd<PlacementReason>(PlacementReasonRepository, item.PlacementReason, new PlacementReason { Key = item.PlacementReason });
                         var pickupReasonTask = FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason });
-
-                        var existing = await existingTask;
-                        var deployment = existing ?? Mapper.Map<Deployment>(item);
-
                         var neighborhoodTask = NeighborhoodRepository.Find(deployment.Location);
 
                         deployment.CompanyKey = (await companyTask).Key;

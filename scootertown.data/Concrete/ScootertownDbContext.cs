@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PDX.PBOT.Scootertown.Data.Extensions;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
@@ -10,6 +11,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
 {
     public class ScootertownDbContext : DbContext
     {
+        private readonly ILogger Logger;
         readonly VehicleStoreOptions StoreOptions;
         // Dimensions
         public DbSet<Calendar> Calendar { get; set; }
@@ -25,8 +27,13 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public DbSet<Deployment> Deployments { get; set; }
 
 
-        public ScootertownDbContext(DbContextOptions<ScootertownDbContext> options, VehicleStoreOptions storeOptions) : base(options)
+        public ScootertownDbContext(
+            ILogger<ScootertownDbContext> logger,
+            DbContextOptions<ScootertownDbContext> options,
+            VehicleStoreOptions storeOptions) : base(options)
         {
+            Logger = logger;
+            Logger.LogDebug("Creating context object...");
             this.StoreOptions = storeOptions ?? throw new ArgumentNullException(nameof(storeOptions));
         }
 
