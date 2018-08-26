@@ -33,7 +33,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
             VehicleStoreOptions storeOptions) : base(options)
         {
             Logger = logger;
-            Logger.LogDebug("Creating context object...");
+            Logger.LogTrace("Creating context object...");
             this.StoreOptions = storeOptions ?? throw new ArgumentNullException(nameof(storeOptions));
         }
 
@@ -58,6 +58,12 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public Task<int> SaveChangesAsync()
         {
             return base.SaveChangesAsync();
+        }
+
+        public override void Dispose()
+        {
+            Logger.LogTrace("Disposing context...");
+            base.Dispose();
         }
     }
 }
