@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Concrete;
 
@@ -22,7 +23,9 @@ namespace PDX.PBOT.Scootertown.Data
             );
             var options = builder.Options;
 
-            var context = new ScootertownDbContext(new ILogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
+            var loggerFactory = new LoggerFactory();
+
+            var context = new ScootertownDbContext(loggerFactory.CreateLogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
 
             return context;
         }
