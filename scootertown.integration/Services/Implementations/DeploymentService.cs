@@ -74,7 +74,6 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     var currentDeployment = activeDeployments.FirstOrDefault(x => x.VehicleKey == deployment.VehicleKey);
                     if (currentDeployment != null)
                     {
-                        Logger.LogTrace("Updating active deployment {key}", currentDeployment.Key);
                         // if there is, update LastSeen
                         currentDeployment.LastSeen = now;
                         // only other thing that we should track as changed is a possible end time
@@ -87,7 +86,6 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     else
                     {
                         // if there isn't start a new one
-                        Logger.LogTrace("Creating new deployment record for vehicle {key}", deployment.VehicleKey);
 
                         // Get the reference properties set up
                         var companyTask = FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company });
