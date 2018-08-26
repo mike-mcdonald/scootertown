@@ -72,9 +72,9 @@ namespace PDX.PBOT.Scootertown.Integration
                         {
                             Logger.LogDebug("Retrieving availability for {Company}.", manager.Company);
 
-                            var deploymentService = ServiceProvider.GetRequiredService<IDeploymentService>();
-
                             var deployments = await manager.RetrieveAvailability();
+
+                            var deploymentService = ServiceProvider.GetRequiredService<IDeploymentService>();
 
                             Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
 
@@ -82,7 +82,7 @@ namespace PDX.PBOT.Scootertown.Integration
 
                             Logger.LogDebug("Done writing availability records for {Company}.", manager.Company);
                         }
-                        catch (System.Exception e)
+                        catch (Exception e)
                         {
                             Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
                         }
@@ -105,9 +105,9 @@ namespace PDX.PBOT.Scootertown.Integration
                                 {
                                     Logger.LogDebug("Retrieving trips for {Company}.", manager.Company);
 
-                                    var tripService = ServiceProvider.GetRequiredService<ITripService>();
-
                                     var trips = await manager.RetrieveTrips();
+
+                                    var tripService = ServiceProvider.GetRequiredService<ITripService>();
 
                                     Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 
