@@ -28,7 +28,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test
         private readonly IDeploymentService Service;
         private readonly Calendars Calendars;
         private readonly Vehicles Vehicles;
-        private readonly List<DeploymentDTO> Deployments;
+        private readonly Queue<DeploymentDTO> Deployments;
         public readonly DeploymentRepository DeploymentRepository;
         private readonly CalendarRepository CalendarRepository;
         private readonly CompanyRepository CompanyRepository;
@@ -57,7 +57,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new SafeGeoJsonConverter());
 
-            Deployments = JsonConvert.DeserializeAnonymousType(File.ReadAllText("sample.deployments.json"), new { availability = new List<DeploymentDTO>() }, settings).availability;
+            Deployments = JsonConvert.DeserializeAnonymousType(File.ReadAllText("sample.deployments.json"), new { availability = new Queue<DeploymentDTO>() }, settings).availability;
         }
 
         [Fact]
@@ -73,6 +73,8 @@ namespace PDX.PBOT.Scootertown.Integration.Test
             var count = (await DeploymentRepository.All()).Count;
             await Service.Save(Deployments);
             Assert.Equal(count, (await DeploymentRepository.All()).Count);
+            await Service.Save(Deployments);
+            Assert.Equal(count, (await DeploymentRepository.All()).Count);
         }
 
         [Fact]
@@ -86,7 +88,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test
             deployment = Deployments.FirstOrDefault(x => !x.EndTime.HasValue);
             deployment.EndTime = (int)now.ToUnixTimestamp();
 
-            await Service.Save(new List<DeploymentDTO>(new DeploymentDTO[] { deployment }));
+            await Service.Save(new Queue<DeploymentDTO>(new DeploymentDTO[] { deployment }));
 
             var dbDeployments = await DeploymentRepository.All();
             var dbDeployment = dbDeployments.FirstOrDefault(x =>
