@@ -15,6 +15,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public DbSet<Calendar> Calendar { get; set; }
         public DbSet<VehicleType> Companies { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
+        public DbSet<PatternArea> PatternAreas { get; set; }
         public DbSet<VehicleType> PaymentTypes { get; set; }
         public DbSet<VehicleType> PlacementReasons { get; set; }
         public DbSet<VehicleType> RemovalReasons { get; set; }
@@ -43,6 +44,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.EndPoint));
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.Route));
                 modelBuilder.Entity<Neighborhood>(b => b.Ignore(e => e.Geometry));
+                modelBuilder.Entity<PatternArea>(b => b.Ignore(e => e.Geometry));
             }
 
             base.OnModelCreating(modelBuilder);
