@@ -21,6 +21,8 @@ namespace PDX.PBOT.Scootertown.API.Models
         public short? SampleRate { get; set; }
         public int? NeighborhoodStart { get; set; }
         public int? NeighborhoodEnd { get; set; }
+        public int? PatternAreaStartKey { get; set; }
+        public int? PatternAreaEndKey { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string ParkingVerification { get; set; }
