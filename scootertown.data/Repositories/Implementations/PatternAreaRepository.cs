@@ -8,7 +8,7 @@ using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
 
 namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 {
-    public class PatternAreaRepository : DimensionRepositoryBase<Neighborhood>, IPatternAreaRepository
+    public class PatternAreaRepository : DimensionRepositoryBase<PatternArea>, IPatternAreaRepository
     {
         public PatternAreaRepository(ScootertownDbContext context) : base(context) { }
 
