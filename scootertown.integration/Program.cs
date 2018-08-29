@@ -15,6 +15,7 @@ using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Repositories.Implementations;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
+using PDX.PBOT.Scootertown.Infrastructure.Mappings;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Mappings;
 using PDX.PBOT.Scootertown.Integration.Options;
@@ -58,6 +59,11 @@ namespace PDX.PBOT.Scootertown.Integration
                         );
                     });
 
+                    services.Configure<APIOptions>(config =>
+                    {
+                        config.BaseAddress = context.Configuration.GetValue<string>("BaseAddress");
+                    });
+
                     // database table options
                     var storeOptions = new VehicleStoreOptions();
                     services.AddSingleton(storeOptions);
@@ -73,24 +79,8 @@ namespace PDX.PBOT.Scootertown.Integration
                             );
                         }, ServiceLifetime.Transient);
 
-                    // smaller dimension repositories get singletons to get better performance?
-                    services.AddSingleton<ICompanyRepository, CompanyRepository>();
-                    services.AddSingleton<IPaymentTypeRepository, PaymentTypeRepository>();
-                    services.AddSingleton<IPlacementReasonRepository, PlacementReasonRepository>();
-                    services.AddSingleton<IRemovalReasonRepository, RemovalReasonRepository>();
-                    services.AddSingleton<IVehicleTypeRepository, VehicleTypeRepository>();
-
-                    // larger dimension repositories don't to save memory
-                    services.AddTransient<ICalendarRepository, CalendarRepository>();
-                    services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
-                    services.AddTransient<IVehicleRepository, VehicleRepository>();
-
                     // add generic services for repositories for any geojson we'll read in
                     services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
-
-                    // fact repositories 
-                    services.AddTransient<ITripRepository, TripRepository>();
-                    services.AddTransient<IDeploymentRepository, DeploymentRepository>();
 
                     services.AddTransient<ITripService, TripService>();
                     services.AddTransient<IDeploymentService, DeploymentService>();
