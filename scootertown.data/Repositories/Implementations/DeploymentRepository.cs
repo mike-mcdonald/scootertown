@@ -48,7 +48,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
             await Context.Set<Deployment>().FindAsync(key);
 
         public override async Task<Deployment> Find(string companyKey) =>
-            await Context.Set<Deployment>().Where(t => t.AlternateKey == companyKey).FirstOrDefaultAsync();
+            throw new NotImplementedException();
 
         public async Task<List<Deployment>> Get(DateTime start, DateTime end) =>
             await Context.Set<Deployment>().Where(t =>
@@ -83,6 +83,13 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
         public async Task<List<Deployment>> GetActive() =>
             await Context.Set<Deployment>()
                 .Where(x => x.EndDateKey == null)
+                .ToAsyncEnumerable()
+                .ToList();
+
+        public async Task<List<Deployment>> GetActive(string companyName) =>
+            await Context.Set<Deployment>()
+                .Where(x => x.EndDateKey == null)
+                .Where(x => x.Company.Name == companyName)
                 .ToAsyncEnumerable()
                 .ToList();
     }
