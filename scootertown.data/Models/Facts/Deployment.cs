@@ -7,13 +7,11 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
     public class Deployment : ModelBase
     {
         public new long Key { get; set; }
-        public string AlternateKey { get; set; }
         public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         public DateTime FirstSeen { get; set; }
         public DateTime LastSeen { get; set; }
         public Point Location { get; set; }
-        public bool InEastPortland { get; set; }
         public sbyte BatteryLevel { get; set; }
         public bool AllowedPlacement { get; set; }
         public bool Reserved { get; set; }
