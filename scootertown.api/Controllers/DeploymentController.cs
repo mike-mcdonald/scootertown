@@ -55,8 +55,18 @@ namespace PDX.PBOT.App.API.Controllers
 
         // GET api/deployment/bird/active
         [HttpGet("{company}/active")]
-        public async Task<List<DeploymentDTO>> GetActiveAsync(string company) =>
-            (await DeploymentRepository.GetActive(company)).Select(x => Mapper.Map<DeploymentDTO>(x)).ToList();
+        public async Task<IActionResult> GetActiveAsync(string company)
+        {
+            try
+            {
+                var deployments = await DeploymentRepository.GetActive(company);
+                return Ok(deployments.Select(x => Mapper.Map<DeploymentDTO>(x)).ToList());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
+        }
 
         // GET api/deployment/5
         [HttpGet("{key}")]
