@@ -22,6 +22,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
         public readonly CalendarRepository CalendarRepository;
         public readonly CompanyRepository CompanyRepository;
         public readonly NeighborhoodRepository NeighborhoodRepository;
+        public readonly PatternAreaRepository PatternAreaRepository;
         public readonly PlacementReasonRepository PlacementReasonRepository;
         public readonly RemovalReasonRepository RemovalReasonRepository;
         public readonly VehicleRepository VehicleRepository;
@@ -45,11 +46,13 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
             var context = new ScootertownDbContext(loggerFactory.CreateLogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
 
             NeighborhoodRepository = new NeighborhoodRepository(context);
+            PatternAreaRepository = new PatternAreaRepository(context);
 
             DeploymentService = new DeploymentService(
                 new Mock<ILogger<DeploymentService>>().Object,
                 null,
-                NeighborhoodRepository
+                NeighborhoodRepository,
+                PatternAreaRepository
             );
         }
 
