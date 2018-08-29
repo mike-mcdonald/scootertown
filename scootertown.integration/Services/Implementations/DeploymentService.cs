@@ -67,7 +67,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         // if there is, update LastSeen
                         currentDeployment.LastSeen = now;
                         // only other thing that we should track as changed is a possible end time
-                        currentDeployment.EndTime = item.EndTime.HasValue ? (new DateTime()).FromUnixTimestamp(item.EndTime.Value) : (DateTime?)null;
+                        currentDeployment.EndTime = item.EndTime.ToDateTime();
                         await HttpClient.PutAsJsonAsync<API.Models.DeploymentDTO>($"deployment/{currentDeployment.Key}", currentDeployment);
                         // remove from active list
                         activeDeployments.Remove(currentDeployment);

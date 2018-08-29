@@ -1,13 +1,12 @@
 using System;
 using AutoMapper;
-using GeoJSON.Net.Geometry;
 using PDX.PBOT.Scootertown.API.Models;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
-using PDX.PBOT.Scootertown.Infrastructure.Mappings;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
 
 namespace PDX.PBOT.Scootertown.API.Mappings
 {
-    public class DeploymentProfile : BaseProfile
+    public class DeploymentProfile : Profile
     {
         public DeploymentProfile() : base()
         {
@@ -15,7 +14,7 @@ namespace PDX.PBOT.Scootertown.API.Mappings
                 .ForMember(d => d.Company, opt => opt.MapFrom(s => s.Company.Name))
                 .ForMember(d => d.VehicleType, opt => opt.MapFrom(s => s.VehicleType.Name))
                 .ForMember(d => d.Vehicle, opt => opt.MapFrom(s => s.Vehicle.Name))
-                .ForMember(d => d.Location, opt => opt.MapFrom(s => WriteGeoJson<GeoJSON.Net.Geometry.Point>(s.Location)))
+                .ForMember(d => d.Location, opt => opt.MapFrom(s => s.Location.ToGeoJson<GeoJSON.Net.Geometry.Point>()))
                 .ForMember(d => d.Neighborhood, opt => opt.MapFrom(s => s.NeighborhoodKey))
                 .ForMember(d => d.PlacementReason, opt => opt.MapFrom(s => s.PlacementReasonKey))
                 .ForMember(d => d.PickupReason, opt => opt.MapFrom(s => s.PickupReasonKey))
@@ -25,7 +24,7 @@ namespace PDX.PBOT.Scootertown.API.Mappings
             CreateMap<DeploymentDTO, Deployment>()
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.StartTime.TimeOfDay))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.EndTime.HasValue ? s.EndTime.Value.TimeOfDay : (TimeSpan?)null))
-                .ForMember(d => d.Location, opt => opt.MapFrom(s => ReadGeoJson<NetTopologySuite.Geometries.Point>(s.Location)))
+                .ForMember(d => d.Location, opt => opt.MapFrom(s => s.Location.FromGeoJson<NetTopologySuite.Geometries.Point>()))
 
                 // Relationships
                 .ForMember(d => d.VehicleKey, opt => opt.Ignore())
