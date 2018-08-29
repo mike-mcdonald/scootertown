@@ -29,6 +29,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories
         }
 
         public virtual async Task<List<T>> All() => await Context.Set<T>().ToAsyncEnumerable().ToList();
+        public virtual async Task<long> Count() => await Context.Set<T>().ToAsyncEnumerable().LongCount();
 
         public virtual async Task<T> Find(int key)
         {
