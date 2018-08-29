@@ -7,6 +7,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Interfaces
     {
         Task<T> Add(T item, bool saveImmediately = true);
         Task<List<T>> All();
+        Task<long> Count();
         Task<T> Find(int key);
         Task<T> Find(string alternateKey);
         Task<T> Update(T item, bool saveImmediately = true);
