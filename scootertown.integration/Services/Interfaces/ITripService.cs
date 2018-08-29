@@ -4,7 +4,7 @@ using PDX.PBOT.Scootertown.Integration.Models;
 
 namespace PDX.PBOT.Scootertown.Integration.Services.Interfaces
 {
-    public interface ITripService : IService<TripDTO, Trip>
+    public interface ITripService : IService<TripDTO>
     {
         Task<long> GetTotalTrips(string companyName);
     }

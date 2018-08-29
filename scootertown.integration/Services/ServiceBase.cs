@@ -5,17 +5,19 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GeoJSON.Net.Feature;
 using GeoJSON.Net.Geometry;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using Newtonsoft.Json;
 using PDX.PBOT.Scootertown.Data.Models;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
 
 namespace PDX.PBOT.Scootertown.Integration.Services
 {
-    public abstract class ServiceBase<TSource, TDest> : IService<TSource, TDest>
-        where TDest : ModelBase
+    public abstract class ServiceBase<TSource> : IService<TSource>
+       where TSource : ModelBase
     {
         protected readonly ICalendarRepository CalendarRepository;
 
@@ -24,7 +26,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             CalendarRepository = calendarRepository;
         }
 
-        public abstract Task Save(Queue<TSource> items);
+        public abstract Task Save(string company, Queue<TSource> items);
 
         protected async Task<Calendar> FindOrAddCalendar(long? timestamp)
         {
@@ -32,7 +34,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             {
                 return null;
             }
-            
+
             System.DateTime date = (new DateTime()).FromUnixTimestamp(timestamp.Value);
             return await FindOrAddCalendar(date);
         }
@@ -73,20 +75,33 @@ namespace PDX.PBOT.Scootertown.Integration.Services
             return dbItem;
         }
 
-        protected Queue<TDest> ReadGeoJsonFile<TGeometry>(string fileName)
+        protected Queue<TSource> ReadGeoJsonFile<TGeometry>(string fileName)
             where TGeometry : IGeometryObject
         {
             var collection = JsonConvert.DeserializeObject<FeatureCollection>(
                 File.ReadAllText(fileName)
             );
 
-            var queue = new Queue<TDest>();
+            var queue = new Queue<TSource>();
             foreach (var feature in collection.Features)
             {
-                var item = Mapper.Map<TDest>(feature);
+                var item = Mapper.Map<TSource>(feature);
                 queue.Enqueue(item);
             }
             return queue;
+        }
+
+        protected T ReadGeoJson<T>(IGeometryObject geometry) where T : Geometry
+        {
+            if (geometry == null)
+            {
+                return null;
+            }
+
+            string json = JsonConvert.SerializeObject(geometry);
+            GeoJsonReader reader = new GeoJsonReader();
+            T result = reader.Read<T>(json);
+            return result;
         }
     }
 }

@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace PDX.PBOT.Scootertown.Integration.Services.Interfaces
 {
-    public interface IService<TSource, TDest>
+    public interface IService<TSource>
     {
-        Task Save(Queue<TSource> items);
+        Task Save(string company, Queue<TSource> items);
     }
 }
