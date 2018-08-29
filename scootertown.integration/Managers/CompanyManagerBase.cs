@@ -45,23 +45,11 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             {
                 Client.DefaultRequestHeaders.Add(setting.Key, setting.Value);
             }
-
-            JsonSettings = new JsonSerializerSettings();
-            JsonSettings.Converters.Add(new SafeGeoJsonConverter());
         }
 
         public abstract Task<Queue<DeploymentDTO>> RetrieveAvailability();
         public abstract Task<Queue<CollisionDTO>> RetrieveCollisions();
         public abstract Task<Queue<ComplaintDTO>> RetrieveComplaints();
         public abstract Task<Queue<TripDTO>> RetrieveTrips(long offset);
-
-        protected async Task<T> DeserializeJson<T>(HttpResponseMessage response, T anonymousObject)
-        {
-            var stream = await response.Content.ReadAsStreamAsync();
-            var reader = new JsonTextReader(new StreamReader(stream));
-            var serializer = JsonSerializer.Create();
-            serializer.Converters.Add(new SafeGeoJsonConverter());
-            return serializer.Deserialize<T>(reader);
-        }
     }
 }
