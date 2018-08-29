@@ -78,8 +78,25 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 neighborhood.HasIndex(x => x.AlternateKey).IsUnique();
                 neighborhood.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
 
-                neighborhood.HasMany(x => x.TripsStarted).WithOne(x => x.NeighborhoodStart);
-                neighborhood.HasMany(x => x.TripsEnded).WithOne(x => x.NeighborhoodEnd);
+                neighborhood.HasMany(x => x.Deployments).WithOne(x => x.Neighborhood).HasForeignKey(x => x.NeighborhoodKey);
+                neighborhood.HasMany(x => x.TripsStarted).WithOne(x => x.NeighborhoodStart).HasForeignKey(x => x.NeighborhoodStartKey);
+                neighborhood.HasMany(x => x.TripsEnded).WithOne(x => x.NeighborhoodEnd).HasForeignKey(x => x.NeighborhoodEndKey);
+            });
+
+             modelBuilder.Entity<PatternArea>(patternArea =>
+            {
+                patternArea.ToTable(storeOptions.PatternArea);
+
+                patternArea.HasKey(x => x.Key);
+
+                patternArea.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                patternArea.Property(x => x.Geometry);
+
+                patternArea.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
+
+                patternArea.HasMany(x => x.Deployments).WithOne(x => x.PatternArea).HasForeignKey(x => x.PatternAreaKey);
+                patternArea.HasMany(x => x.TripsStarted).WithOne(x => x.PatternAreaStart).HasForeignKey(x => x.PatternAreaStartKey);
+                patternArea.HasMany(x => x.TripsEnded).WithOne(x => x.PatternAreaEnd).HasForeignKey(x => x.PatternAreaEndKey);
             });
 
             modelBuilder.Entity<PaymentType>(type =>

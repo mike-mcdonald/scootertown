@@ -40,6 +40,10 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public int? NeighborhoodStartKey { get; set; }
         public Neighborhood NeighborhoodStart { get; set; }
         public int? NeighborhoodEndKey { get; set; }
+        public PatternArea PatternAreaEnd { get; set; }
+        public int? PatternAreaStartKey { get; set; }
+        public PatternArea PatternAreaStart { get; set; }
+        public int? PatternAreaEndKey { get; set; }
         public Neighborhood NeighborhoodEnd { get; set; }
         public int PaymentTypeKey { get; set; }
         public PaymentType PaymentType { get; set; }
