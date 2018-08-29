@@ -44,25 +44,12 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
 
             var context = new ScootertownDbContext(loggerFactory.CreateLogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
 
-            DeploymentRepository = new DeploymentRepository(context);
-            CalendarRepository = new CalendarRepository(context);
-            CompanyRepository = new CompanyRepository(context);
             NeighborhoodRepository = new NeighborhoodRepository(context);
-            PlacementReasonRepository = new PlacementReasonRepository(context);
-            RemovalReasonRepository = new RemovalReasonRepository(context);
-            VehicleRepository = new VehicleRepository(context);
-            VehicleTypeRepository = new VehicleTypeRepository(context);
 
             DeploymentService = new DeploymentService(
                 new Mock<ILogger<DeploymentService>>().Object,
-                DeploymentRepository,
-                CalendarRepository,
-                CompanyRepository,
-                NeighborhoodRepository,
-                PlacementReasonRepository,
-                RemovalReasonRepository,
-                VehicleRepository,
-                VehicleTypeRepository
+                null,
+                NeighborhoodRepository
             );
         }
 

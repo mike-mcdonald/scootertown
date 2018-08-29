@@ -3,7 +3,7 @@ using System.IO;
 using AutoMapper;
 using Newtonsoft.Json;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 using PDX.PBOT.Scootertown.Integration.Mappings;
 using PDX.PBOT.Scootertown.Integration.Models;
 using Xunit;
