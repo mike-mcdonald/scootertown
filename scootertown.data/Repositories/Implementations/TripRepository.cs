@@ -14,6 +14,9 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
     {
         public TripRepository(ScootertownDbContext context) : base(context) { }
 
+        public async Task<long> CountByCompany(string company) =>
+            await Context.Set<Trip>().Where(x => x.Company.Name == company).LongCountAsync();
+
         public async Task AddAll(List<Trip> trips)
         {
             Context.Set<Trip>().AddRange(trips);
