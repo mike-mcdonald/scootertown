@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
 using PDX.PBOT.Scootertown.Integration.Models;
 
 namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
@@ -26,8 +23,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 var response = await Client.GetAsync($"availability?limit={limit}&offset={offset}");
                 if (response.IsSuccessStatusCode)
                 {
-                    var streamTask = response.Content.ReadAsStringAsync();
-                    retrievedAvailability = JsonConvert.DeserializeAnonymousType(await streamTask, new { availability = new List<DeploymentDTO>() }).availability;
+                    retrievedAvailability = (await DeserializeJson(response, new { availability = new List<DeploymentDTO>() })).availability;
                     totalAvailability.AddRange(retrievedAvailability);
                     offset += retrievedAvailability.Count;
                 }
@@ -45,8 +41,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("collisions");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = response.Content.ReadAsStringAsync();
-                var collisions = JsonConvert.DeserializeAnonymousType(await streamTask, new { collisions = new Queue<CollisionDTO>() }).collisions;
+                var collisions = (await DeserializeJson(response, new { collisions = new Queue<CollisionDTO>() })).collisions;
                 return collisions;
             }
 
@@ -58,8 +53,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("complaints");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = response.Content.ReadAsStringAsync();
-                var complaints = JsonConvert.DeserializeAnonymousType(await streamTask, new { complaints = new Queue<ComplaintDTO>() }).complaints;
+                var complaints = (await DeserializeJson(response, new { complaints = new Queue<ComplaintDTO>() })).complaints;
                 return complaints;
             }
 
@@ -71,14 +65,10 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var limit = 500;
             var trips = new Queue<TripDTO>();
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.Converters.Add(new SafeGeoJsonConverter());
-
             var response = await Client.GetAsync($"trips?limit={limit}&offset={Offset}");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { trips = new Queue<TripDTO>() }, settings).trips;
+                trips = (await response.DeserializeJson(new { trips = new Queue<TripDTO>() })).trips;
                 Offset += trips.Count;
             }
             else

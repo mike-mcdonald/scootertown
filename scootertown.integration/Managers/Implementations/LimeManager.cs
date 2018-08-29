@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
 using PDX.PBOT.Scootertown.Integration.Models;
-using PDX.PBOT.Scootertown.Integration.Models.Lime;
 
 namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 {
@@ -15,17 +13,26 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
     {
         public LimeManager(IConfigurationSection configuration) : base("Lime", configuration) { }
 
-        public override async Task<Queue<Models.DeploymentDTO>> RetrieveAvailability()
+        public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
         {
-            var response = await Client.GetAsync("availability");
-            if (response.IsSuccessStatusCode)
+            var page = 1;
+            var total = new List<DeploymentDTO>();
+            var current = new List<DeploymentDTO>();
+            do
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var availability = JsonConvert.DeserializeAnonymousType(streamTask, new { max_page = 1, data = new Queue<Models.Lime.DeploymentDTO>() }).data;
-                return new Queue<Models.DeploymentDTO>(availability.Select(a => Mapper.Map<Models.DeploymentDTO>(a)).ToList());
-            }
+                var response = await Client.GetAsync($"availability?page={page}");
+                if (response.IsSuccessStatusCode)
+                {
+                    current = (await response.DeserializeJson(new { max_page = 1, data = new List<DeploymentDTO>() })).data;
+                    total.AddRange(current);
+                }
+                else
+                {
+                    throw new Exception($"Error retrieving availability for {CompanyName}");
+                }
+            } while (current.Count > 0);
 
-            throw new Exception($"Error retrieving availability for {CompanyName}");
+            return new Queue<DeploymentDTO>(total);
         }
 
         public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
@@ -33,8 +40,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("collisions");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var collisions = JsonConvert.DeserializeAnonymousType(streamTask, new { data = new Queue<CollisionDTO>() }).data;
+                var collisions = (await response.DeserializeJson(new { data = new Queue<CollisionDTO>() })).data;
                 return collisions;
             }
 
@@ -47,23 +53,22 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                var complaints = JsonConvert.DeserializeAnonymousType(streamTask, new { max_page = 1, data = new Queue<ComplaintDTO>() }).data;
+                var complaints = (await response.DeserializeJson(new { max_page = 1, data = new Queue<ComplaintDTO>() })).data;
                 return complaints;
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<Queue<Models.TripDTO>> RetrieveTrips(long offset = 0)
+        public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
         {
-            var trips = new Queue<Models.Lime.TripDTO>();
+            var trips = new Queue<TripDTO>();
             var page = Offset / 500 + 1;
 
             var response = await Client.GetAsync($"trips?page={page}");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                trips = JsonConvert.DeserializeAnonymousType(streamTask, new { max_page = 1, data = new Queue<Models.Lime.TripDTO>() }).data;
+                trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
                 Offset += trips.Count;
             }
             else
@@ -71,7 +76,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 throw new Exception($"Error retrieving trips for {CompanyName}");
             }
 
-            return new Queue<Models.TripDTO>(trips.Select(t => Mapper.Map<Models.TripDTO>(t)).ToList());
+            return new Queue<TripDTO>(trips.Select(t => Mapper.Map<TripDTO>(t)).ToList());
         }
     }
 }
