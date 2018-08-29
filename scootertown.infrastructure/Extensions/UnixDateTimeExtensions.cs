@@ -1,6 +1,6 @@
 using System;
 
-namespace PDX.PBOT.Scootertown.Integration.Infrastructure
+namespace PDX.PBOT.Scootertown.Infrastructure.Extensions
 {
     public static class UnixDateTimeExtensions
     {

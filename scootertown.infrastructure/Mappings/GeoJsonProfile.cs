@@ -1,19 +1,7 @@
-using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using PDX.PBOT.Scootertown.Data.Models.Facts;
-using PDX.PBOT.Scootertown.Integration.Models;
-using PDX.PBOT.Scootertown.Integration.Models.Lime;
-using GeoJSON.Net;
-using Newtonsoft.Json;
-using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 
-namespace PDX.PBOT.Scootertown.Integration.Mappings
+namespace PDX.PBOT.Scootertown.Infrastructure.Mappings
 {
     public class GeoJsonProfile : BaseProfile
     {
@@ -32,6 +20,12 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
 
             CreateMap<GeoJSON.Net.Geometry.IGeometryObject, Geometry>()
                 .Substitute(s => ReadGeoJson<Geometry>(s));
+
+            CreateMap<Point, GeoJSON.Net.Geometry.Point>()
+                .Substitute(s => WriteGeoJson<GeoJSON.Net.Geometry.Point>(s));
+
+            CreateMap<LineString, GeoJSON.Net.Geometry.LineString>()
+                .Substitute(s => WriteGeoJson<GeoJSON.Net.Geometry.LineString>(s));
         }
     }
 }

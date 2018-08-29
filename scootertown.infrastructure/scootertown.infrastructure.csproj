@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>PDX.PBOT.Scootertown.Infrastructure</AssemblyName>
+    <PackageId>PDX.PBOT.Scootertown.Infrastructure</PackageId>
+    <RootNamespace>PDX.PBOT.Scootertown.Infrastructure</RootNamespace>
+    <Company>City of Portland</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="GeoJSON.Net" Version="1.1.64" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.0" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="1.15.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\scootertown.data\scootertown.data.csproj" />
+  </ItemGroup>
+
+</Project>
