@@ -47,7 +47,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
         public async Task<Deployment> Find(long key) =>
             await Context.Set<Deployment>().FindAsync(key);
 
-        public override async Task<Deployment> Find(string companyKey) =>
+        public override Task<Deployment> Find(string companyKey) =>
             throw new NotImplementedException();
 
         public async Task<List<Deployment>> Get(DateTime start, DateTime end) =>
