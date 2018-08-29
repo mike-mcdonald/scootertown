@@ -23,7 +23,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 var response = await Client.GetAsync($"availability?limit={limit}&offset={offset}");
                 if (response.IsSuccessStatusCode)
                 {
-                    retrievedAvailability = (await DeserializeJson(response, new { availability = new List<DeploymentDTO>() })).availability;
+                    retrievedAvailability = (await response.DeserializeJson(new { availability = new List<DeploymentDTO>() })).availability;
                     totalAvailability.AddRange(retrievedAvailability);
                     offset += retrievedAvailability.Count;
                 }
@@ -41,7 +41,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("collisions");
             if (response.IsSuccessStatusCode)
             {
-                var collisions = (await DeserializeJson(response, new { collisions = new Queue<CollisionDTO>() })).collisions;
+                var collisions = (await response.DeserializeJson(new { collisions = new Queue<CollisionDTO>() })).collisions;
                 return collisions;
             }
 
@@ -53,7 +53,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("complaints");
             if (response.IsSuccessStatusCode)
             {
-                var complaints = (await DeserializeJson(response, new { complaints = new Queue<ComplaintDTO>() })).complaints;
+                var complaints = (await response.DeserializeJson(new { complaints = new Queue<ComplaintDTO>() })).complaints;
                 return complaints;
             }
 
