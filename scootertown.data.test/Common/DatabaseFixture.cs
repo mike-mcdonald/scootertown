@@ -1,12 +1,13 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Options;
 
 namespace PDX.PBOT.Scootertown.Data.Tests.Common
 {
-    public class DatabaseFixture : IDisposable
+    public class DatabaseFixture
     {
         public ScootertownDbContext Context { get; private set; }
 
@@ -14,27 +15,14 @@ namespace PDX.PBOT.Scootertown.Data.Tests.Common
         {
             DbContextOptions<ScootertownDbContext> options;
             var builder = new DbContextOptionsBuilder<ScootertownDbContext>();
-            builder.UseNpgsql(
-                @"Host=localhost;Database=scootertown;Username=scootertownadmin;Password=b43b25iun8fneufniosergigakei0r",
-                o => o.UseNetTopologySuite()
-            );
+            builder.UseInMemoryDatabase("Intregration");
             options = builder.Options;
 
-            var context = new ScootertownDbContext(options, new VehicleStoreOptions());
+            var loggerFactory = new LoggerFactory();
 
-            var connection = ((NpgsqlConnection)context.Database.GetDbConnection());
-            if (!context.Database.EnsureCreated())
-            {
-                connection.Open();
-            }
-            connection.ReloadTypes();
+            var context = new ScootertownDbContext(loggerFactory.CreateLogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
 
             Context = context;
-        }
-
-        public void Dispose()
-        {
-            Context.Database.EnsureDeleted();
         }
     }
 }
