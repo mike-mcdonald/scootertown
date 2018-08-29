@@ -2,11 +2,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\scootertown.data\scootertown.data.csproj" />
+    <ProjectReference Include="..\scootertown.api\scootertown.api.csproj" />
+    <ProjectReference Include="..\scootertown.infrastructure\scootertown.infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="automapper" Version="7.0.1" />
     <PackageReference Include="geojson.net" Version="1.1.64" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
@@ -14,7 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="1.15.0" />
     <PackageReference Include="newtonsoft.json" Version="11.0.2" />
-    <PackageReference Include="nlog" Version="4.5.8" />
+    <PackageReference Include="nlog" Version="4.5.9" />
     <PackageReference Include="nlog.extensions.logging" Version="1.2.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
   </ItemGroup>
