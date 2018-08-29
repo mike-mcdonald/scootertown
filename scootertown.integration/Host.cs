@@ -53,7 +53,17 @@ namespace PDX.PBOT.Scootertown.Integration
             }
             catch (Exception e)
             {
-                Logger.LogError("Caught exception reading neighborhoodes data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                Logger.LogError("Caught exception reading neighborhood data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+            }
+
+            Logger.LogDebug("Reading pattern areas...");
+            try
+            {
+                await ServiceProvider.GetRequiredService<IPatternAreaService>().Save();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
             }
 
             // set up the offsets to pick up where we left off

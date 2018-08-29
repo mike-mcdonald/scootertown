@@ -21,18 +21,19 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
     {
         private readonly ILogger Logger;
         private readonly INeighborhoodRepository NeighborhoodRepository;
+        private readonly IPatternAreaRepository PatternAreaRepository;
         private readonly HttpClient HttpClient;
-
-        private readonly Polygon EastPortland;
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
             IOptions<APIOptions> options,
-            INeighborhoodRepository neighborhoodRepository
+            INeighborhoodRepository neighborhoodRepository,
+            IPatternAreaRepository patternAreaRepository
         )
         {
             Logger = logger;
             NeighborhoodRepository = neighborhoodRepository;
+            PatternAreaRepository = patternAreaRepository;
 
             HttpClient = new HttpClient();
             HttpClient.BaseAddress = new Uri(options.Value.BaseAddress);
@@ -45,6 +46,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             // get all the active deployments
             //  this is the only awaited one so I can manage the list of active deployments
             var response = await HttpClient.GetAsync($"deployment/{company}/active");
+            response.EnsureSuccessStatusCode();
             var activeDeployments = await response.DeserializeJson(new List<API.Models.DeploymentDTO>());
 
             Logger.LogDebug($"Found {activeDeployments.Count} active deployments for {company}.");
@@ -79,8 +81,10 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
                         // Get the reference properties set up
                         var neighborhoodTask = NeighborhoodRepository.Find(Mapper.Map<Point>(deployment.Location));
+                        var patternAreaTask = PatternAreaRepository.Find(Mapper.Map<Point>(deployment.Location));
 
                         deployment.Neighborhood = (await neighborhoodTask)?.Key;
+                        deployment.PatternAreaKey = (await patternAreaTask)?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;
                         await HttpClient.PostAsJsonAsync("deployment", deployment);

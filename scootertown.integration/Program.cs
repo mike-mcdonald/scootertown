@@ -57,6 +57,10 @@ namespace PDX.PBOT.Scootertown.Integration
                             context.HostingEnvironment.ContentRootPath,
                             context.Configuration.GetValue<string>("NeighborhoodsFile")
                         );
+                        config.PatternAreasFile = Path.Combine(
+                            context.HostingEnvironment.ContentRootPath,
+                            context.Configuration.GetValue<string>("PatternAreasFile")
+                        );
                     });
 
                     services.Configure<APIOptions>(config =>
@@ -81,10 +85,12 @@ namespace PDX.PBOT.Scootertown.Integration
 
                     // add generic services for repositories for any geojson we'll read in
                     services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
+                    services.AddTransient<IPatternAreaRepository, PatternAreaRepository>();
 
                     services.AddTransient<ITripService, TripService>();
                     services.AddTransient<IDeploymentService, DeploymentService>();
                     services.AddTransient<INeighborhoodService, NeighborhoodService>();
+                    services.AddTransient<IPatternAreaService, PatternAreaService>();
 
                     services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
