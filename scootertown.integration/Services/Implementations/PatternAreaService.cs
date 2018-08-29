@@ -29,7 +29,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
         }
 
         public async Task Save() =>
-            await Save(GeoJsonReaders.ReadGeoJsonFile<Geometry>(AreasOfInterest.PatternAreasFile));
+            await Save(GeoJsonReaders.ReadGeoJsonFile<PatternArea>(AreasOfInterest.PatternAreasFile));
 
         public async Task Save(IEnumerable<PatternArea> patternAreas)
         {
