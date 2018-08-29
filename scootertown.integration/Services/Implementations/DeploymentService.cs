@@ -1,142 +1,113 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
-using PDX.PBOT.Scootertown.Data.Models.Dimensions;
-using PDX.PBOT.Scootertown.Data.Models.Facts;
+using Newtonsoft.Json;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
-using PDX.PBOT.Scootertown.Integration.Models;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
+using PDX.PBOT.Scootertown.Integration.Options;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
 
 namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 {
-    public class DeploymentService : ServiceBase<DeploymentDTO, Deployment>, IDeploymentService
+    public class DeploymentService : IDeploymentService
     {
         private readonly ILogger Logger;
-        private readonly IDeploymentRepository DeploymentRepository;
-        private readonly ICompanyRepository CompanyRepository;
         private readonly INeighborhoodRepository NeighborhoodRepository;
-        private readonly IPlacementReasonRepository PlacementReasonRepository;
-        private readonly IRemovalReasonRepository RemovalReasonRepository;
-        private readonly IVehicleRepository VehicleRepository;
-        private readonly IVehicleTypeRepository VehicleTypeRepository;
+        private readonly HttpClient HttpClient;
 
         private readonly Polygon EastPortland;
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
-            IDeploymentRepository deploymentRepository,
-            ICalendarRepository calendarRepository,
-            ICompanyRepository companyRepository,
-            INeighborhoodRepository neighborhoodRepository,
-            IPlacementReasonRepository placementReasonRepository,
-            IRemovalReasonRepository removalReasonRepository,
-            IVehicleRepository vehicleRepository,
-            IVehicleTypeRepository vehicleTypeRepository
-        ) : base(calendarRepository)
+            IOptions<APIOptions> options,
+            INeighborhoodRepository neighborhoodRepository
+        )
         {
             Logger = logger;
-            DeploymentRepository = deploymentRepository;
-            CompanyRepository = companyRepository;
             NeighborhoodRepository = neighborhoodRepository;
-            PlacementReasonRepository = placementReasonRepository;
-            RemovalReasonRepository = removalReasonRepository;
-            VehicleRepository = vehicleRepository;
-            VehicleTypeRepository = vehicleTypeRepository;
+
+            HttpClient = new HttpClient();
+            HttpClient.BaseAddress = new Uri(options.Value.BaseAddress);
         }
 
-        public override async Task Save(Queue<DeploymentDTO> items)
+        public async Task Save(string company, Queue<Integration.Models.DeploymentDTO> items)
         {
-            var now = DateTime.Now.ToUniversalTime();
+            var now = DateTime.Now;
 
             // get all the active deployments
-            var activeDeployments = await DeploymentRepository.GetActive();
+            //  this is the only awaited one so I can manage the list of active deployments
+            var response = await HttpClient.GetAsync($"deployment/{company}/active");
+            var activeDeployments = await response.DeserializeJson(new List<API.Models.DeploymentDTO>());
 
-            DeploymentDTO item;
+            Logger.LogDebug($"Found {activeDeployments.Count} active deployments for {company}.");
+
+            Models.DeploymentDTO item;
+            var currentDeployments = 0;
+            var newDeployments = 0;
             while (items.TryDequeue(out item))
             {
                 try
                 {
                     // Use automapper for the original properties
-                    var deployment = Mapper.Map<Deployment>(item);
-
-                    // need the vehicle so we can test for active deployments
-                    deployment.VehicleKey = (await FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle })).Key;
+                    var deployment = Mapper.Map<API.Models.DeploymentDTO>(item);
 
                     // for this vehicle, is there an active deployment?
-                    var currentDeployment = activeDeployments.FirstOrDefault(x => x.VehicleKey == deployment.VehicleKey);
+                    var currentDeployment = activeDeployments.FirstOrDefault(x => x.Vehicle == deployment.Vehicle);
                     if (currentDeployment != null)
                     {
+                        currentDeployments += 1;
                         // if there is, update LastSeen
                         currentDeployment.LastSeen = now;
                         // only other thing that we should track as changed is a possible end time
-                        currentDeployment.EndDateKey = item.EndTime.HasValue ? (await FindOrAddCalendar(item.EndTime.Value)).Key : (int?)null;
-                        currentDeployment.EndTime = deployment.EndTime;
-                        await DeploymentRepository.Update(currentDeployment, false);
+                        currentDeployment.EndTime = item.EndTime.HasValue ? (new DateTime()).FromUnixTimestamp(item.EndTime.Value) : (DateTime?)null;
+                        await HttpClient.PutAsJsonAsync<API.Models.DeploymentDTO>($"deployment/{currentDeployment.Key}", currentDeployment);
                         // remove from active list
                         activeDeployments.Remove(currentDeployment);
                     }
                     else
                     {
                         // if there isn't start a new one
+                        newDeployments += 1;
 
                         // Get the reference properties set up
-                        var companyTask = FindOrAdd<Company>(CompanyRepository, item.Company, new Company { Name = item.Company });
-                        var startDateTask = FindOrAddCalendar(item.StartTime);
-                        var endDateTask = FindOrAddCalendar(item.EndTime);
-                        var vehicleTask = FindOrAdd<Vehicle>(VehicleRepository, item.Vehicle, new Vehicle { Name = item.Vehicle });
-                        var vehicleTypeTask = FindOrAdd<VehicleType>(VehicleTypeRepository, item.VehicleType, new VehicleType { Key = item.VehicleType });
-                        var placementReasonTask = FindOrAdd<PlacementReason>(PlacementReasonRepository, item.PlacementReason, new PlacementReason { Key = item.PlacementReason });
-                        var pickupReasonTask = FindOrAdd<RemovalReason>(RemovalReasonRepository, item.PickupReason, new RemovalReason { Key = item.PickupReason });
-                        var neighborhoodTask = NeighborhoodRepository.Find(deployment.Location);
+                        var neighborhoodTask = NeighborhoodRepository.Find(Mapper.Map<Point>(deployment.Location));
 
-                        deployment.CompanyKey = (await companyTask).Key;
-                        deployment.StartDateKey = (await startDateTask).Key;
-                        deployment.EndDateKey = (await endDateTask)?.Key;
-                        deployment.VehicleKey = (await vehicleTask).Key;
-                        deployment.VehicleTypeKey = (await vehicleTypeTask).Key;
-                        deployment.PlacementReasonKey = (await placementReasonTask).Key;
-                        deployment.PickupReasonKey = (await pickupReasonTask).Key;
-
-                        deployment.NeighborhoodKey = (await neighborhoodTask)?.Key;
+                        deployment.Neighborhood = (await neighborhoodTask)?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;
-                        await DeploymentRepository.Add(deployment, false);
+                        await HttpClient.PostAsJsonAsync("deployment", deployment);
                     }
                 }
-                catch (DbUpdateException e)
+                catch (Exception e)
                 {
                     // this might be because we are seeing something for the first time
                     Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException.Message);
                 }
             }
 
+            Logger.LogDebug($"Found {currentDeployments} existing deployments and {newDeployments} new deployments.");
+
             // for all the other active deployments that we didn't see, update the end time to now
-            var endDateKey = (await FindOrAddCalendar(now)).Key;
             foreach (var deploymentToEnd in activeDeployments)
             {
                 try
                 {
-                    deploymentToEnd.LastSeen = now;
-                    deploymentToEnd.EndDateKey = endDateKey;
-                    deploymentToEnd.EndTime = now.TimeOfDay;
-                    await DeploymentRepository.Update(deploymentToEnd, false);
+                    await HttpClient.PostAsync($"deployment/{deploymentToEnd.Key}/end", null);
                 }
-                catch (DbUpdateException e)
+                catch (Exception e)
                 {
                     // this might be because we are seeing something for the first time
                     Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException.Message);
                 }
             }
-
-            await DeploymentRepository.SaveChanges();
         }
     }
 }
