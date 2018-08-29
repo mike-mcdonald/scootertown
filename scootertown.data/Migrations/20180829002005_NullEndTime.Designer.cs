@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -10,9 +11,10 @@ using PDX.PBOT.Scootertown.Data.Concrete;
 namespace PDX.PBOT.Scootertown.Data.Migrations
 {
     [DbContext(typeof(ScootertownDbContext))]
-    partial class ScootertownDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180829002005_NullEndTime")]
+    partial class NullEndTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

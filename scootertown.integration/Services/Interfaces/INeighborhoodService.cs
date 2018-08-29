@@ -4,7 +4,7 @@ using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 
 namespace PDX.PBOT.Scootertown.Integration.Services.Interfaces
 {
-    public interface INeighborhoodService : IService<Neighborhood, Neighborhood>
+    public interface INeighborhoodService
     {
         Task Save();
     }

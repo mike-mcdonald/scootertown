@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Threading.Tasks;
-using GeoJSON.Net.Geometry;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.FileExtensions;
-using Microsoft.Extensions.Configuration.Json;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Models;
 
@@ -50,9 +45,6 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             {
                 Client.DefaultRequestHeaders.Add(setting.Key, setting.Value);
             }
-
-            JsonSettings = new JsonSerializerSettings();
-            JsonSettings.Converters.Add(new SafeGeoJsonConverter());
         }
 
         public abstract Task<Queue<DeploymentDTO>> RetrieveAvailability();

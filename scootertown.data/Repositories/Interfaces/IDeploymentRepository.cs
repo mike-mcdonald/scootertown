@@ -11,5 +11,6 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Interfaces
         Task<Deployment> Find(long key);
         Task<List<Deployment>> Get(DateTime start, DateTime end);
         Task<List<Deployment>> GetActive();
+        Task<List<Deployment>> GetActive(string companyName);
     }
 }

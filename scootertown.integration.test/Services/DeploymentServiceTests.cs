@@ -2,21 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Newtonsoft.Json;
-using PDX.PBOT.Scootertown.Data.Concrete;
-using PDX.PBOT.Scootertown.Data.Models.Facts;
-using PDX.PBOT.Scootertown.Data.Options;
 using PDX.PBOT.Scootertown.Data.Repositories.Implementations;
-using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
 using PDX.PBOT.Scootertown.Data.Tests.Common;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
-using PDX.PBOT.Scootertown.Integration.Mappings;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 using PDX.PBOT.Scootertown.Integration.Models;
-using PDX.PBOT.Scootertown.Integration.Services.Implementations;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Test.Common;
 using Xunit;
@@ -63,17 +54,17 @@ namespace PDX.PBOT.Scootertown.Integration.Test
         [Fact]
         public async void ShouldSaveTestDeployments()
         {
-            await Service.Save(Deployments);
+            await Service.Save("Lime", Deployments);
         }
 
         [Fact]
         public async void ShouldSaveSameDeployments()
         {
-            await Service.Save(Deployments);
+            await Service.Save("Lime", Deployments);
             var count = (await DeploymentRepository.All()).Count;
-            await Service.Save(Deployments);
+            await Service.Save("Lime", Deployments);
             Assert.Equal(count, (await DeploymentRepository.All()).Count);
-            await Service.Save(Deployments);
+            await Service.Save("Lime", Deployments);
             Assert.Equal(count, (await DeploymentRepository.All()).Count);
         }
 
@@ -81,14 +72,14 @@ namespace PDX.PBOT.Scootertown.Integration.Test
         public async void ShouldUpdateDeployments()
         {
             var deployment = new DeploymentDTO();
-            await Service.Save(Deployments);
+            await Service.Save("Lime", Deployments);
 
             var now = DateTime.Now.ToUniversalTime();
 
             deployment = Deployments.FirstOrDefault(x => !x.EndTime.HasValue);
             deployment.EndTime = (int)now.ToUnixTimestamp();
 
-            await Service.Save(new Queue<DeploymentDTO>(new DeploymentDTO[] { deployment }));
+            await Service.Save("Lime", new Queue<DeploymentDTO>(new DeploymentDTO[] { deployment }));
 
             var dbDeployments = await DeploymentRepository.All();
             var dbDeployment = dbDeployments.FirstOrDefault(x =>
@@ -97,7 +88,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test
 
             Assert.Equal(Deployments.Count, dbDeployments.Count); // didn't add a new one
             Assert.NotNull(dbDeployment);
-            Assert.Equal((long)now.TimeOfDay.TotalSeconds, dbDeployment.EndTime.TotalSeconds);
+            Assert.Equal((long)now.TimeOfDay.TotalSeconds, dbDeployment.EndTime?.TotalSeconds);
         }
     }
 }

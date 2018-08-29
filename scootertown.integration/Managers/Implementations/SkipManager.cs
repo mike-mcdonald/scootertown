@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using GeoJSON.Net.Geometry;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using PDX.PBOT.Scootertown.Integration.Infrastructure;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 using PDX.PBOT.Scootertown.Integration.Models;
 
 namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
@@ -21,8 +21,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync("availability.json");
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var availability = JsonConvert.DeserializeObject<List<DeploymentDTO>>(streamTask, JsonSettings);
+                var availability = await response.DeserializeJson(new List<DeploymentDTO>());
                 availability.ForEach(deployment =>
                 {
                     // flip the coordinates
@@ -45,8 +44,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var collisions = JsonConvert.DeserializeObject<Queue<CollisionDTO>>(streamTask, JsonSettings);
+                var collisions = await response.DeserializeJson(new Queue<CollisionDTO>());
                 return collisions;
             }
 
@@ -59,7 +57,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var streamTask = await response.Content.ReadAsStringAsync();
-                var complaints = JsonConvert.DeserializeObject<Queue<ComplaintDTO>>(streamTask, JsonSettings);
+                var complaints = await response.DeserializeJson(new Queue<ComplaintDTO>());
                 return complaints;
             }
 
@@ -71,13 +69,9 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync($"trips.json");
             if (response.IsSuccessStatusCode)
             {
-                var stream = await response.Content.ReadAsStreamAsync();
-                var reader = new JsonTextReader(new StreamReader(stream));
-                var serializer = new JsonSerializer();
-                serializer.Converters.Add(new SafeGeoJsonConverter());
                 try
                 {
-                    var trips = serializer.Deserialize<List<TripDTO>>(reader);
+                    var trips = await response.DeserializeJson(new List<TripDTO>());
                     trips.ForEach(trip =>
                     {
                         // flip the coordinates

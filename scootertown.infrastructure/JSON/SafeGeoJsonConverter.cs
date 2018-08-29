@@ -1,10 +1,6 @@
-using System.Reflection;
-using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PDX.PBOT.Scootertown.Integration.Models;
 
-namespace PDX.PBOT.Scootertown.Integration.Infrastructure
+namespace PDX.PBOT.Scootertown.Infrastructure.JSON
 {
     public class SafeGeoJsonConverter : GeoJSON.Net.Converters.GeoJsonConverter
     {

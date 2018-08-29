@@ -3,5 +3,5 @@ using PDX.PBOT.Scootertown.Integration.Models;
 
 namespace PDX.PBOT.Scootertown.Integration.Services.Interfaces
 {
-    public interface IDeploymentService : IService<DeploymentDTO, Deployment> { }
+    public interface IDeploymentService : IService<DeploymentDTO> { }
 }

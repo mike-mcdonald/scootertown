@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Integration.Managers;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
@@ -21,6 +20,7 @@ namespace PDX.PBOT.Scootertown.Integration
         private readonly IServiceProvider ServiceProvider;
         private readonly List<ICompanyManager> Managers = new List<ICompanyManager>();
         private readonly Dictionary<string, bool> TripQueryLock = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> DeploymentQueryLock = new Dictionary<string, bool>();
 
         public Host(
             IConfiguration configuration,
@@ -38,6 +38,7 @@ namespace PDX.PBOT.Scootertown.Integration
                 var manager = ManagerFactory.GetManager(setting.Key, setting);
                 Managers.Add(manager);
                 TripQueryLock.Add(setting.Key, false);
+                DeploymentQueryLock.Add(setting.Key, false);
             }
         }
 
@@ -66,29 +67,38 @@ namespace PDX.PBOT.Scootertown.Integration
             {
                 foreach (var manager in Managers)
                 {
-                    var deploymentTask = Task.Run(async () =>
+                    if (!DeploymentQueryLock[manager.Company])
                     {
-                        try
+                        var deploymentTask = Task.Run(async () =>
                         {
-                            Logger.LogDebug("Retrieving availability for {Company}.", manager.Company);
+                            DeploymentQueryLock[manager.Company] = true;
 
-                            var deployments = await manager.RetrieveAvailability();
+                            try
+                            {
+                                Logger.LogDebug("Retrieving availability for {Company}.", manager.Company);
 
-                            var deploymentService = ServiceProvider.GetRequiredService<IDeploymentService>();
+                                var deployments = await manager.RetrieveAvailability();
 
-                            Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
+                                var deploymentService = ServiceProvider.GetRequiredService<IDeploymentService>();
 
-                            await deploymentService.Save(deployments);
+                                Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
 
-                            Logger.LogDebug("Done writing availability records for {Company}.", manager.Company);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
-                        }
-                    });
+                                await deploymentService.Save(manager.Company, deployments);
+
+                                Logger.LogDebug("Done writing availability records for {Company}.", manager.Company);
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                            }
+                            finally
+                            {
+                                DeploymentQueryLock[manager.Company] = false;
+                            }
+                        });
+                    }
                 }
-            }, new AutoResetEvent(false), 1000, 1000 * 60);
+            }, new AutoResetEvent(false), 1000, 1000 * 20);
 
             tripTimer = new Timer(obj =>
             {
@@ -101,6 +111,7 @@ namespace PDX.PBOT.Scootertown.Integration
                             var tripsTask = Task.Run(async () =>
                             {
                                 TripQueryLock[manager.Company] = true;
+
                                 try
                                 {
                                     Logger.LogDebug("Retrieving trips for {Company}.", manager.Company);
@@ -111,13 +122,13 @@ namespace PDX.PBOT.Scootertown.Integration
 
                                     Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 
-                                    await tripService.Save(trips);
+                                    await tripService.Save(manager.Company, trips);
 
                                     Logger.LogDebug("Done writing trip records for {Company}.", manager.Company);
                                 }
                                 catch (System.Exception e)
                                 {
-                                    Logger.LogError(1, e, "Caught exception processing data.");
+                                    Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
                                 }
                                 finally
                                 {
