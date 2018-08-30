@@ -62,17 +62,20 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     var deployment = Mapper.Map<API.Models.DeploymentDTO>(item);
 
                     // for this vehicle, is there an active deployment?
-                    var currentDeployment = activeDeployments.FirstOrDefault(x => x.Vehicle == deployment.Vehicle);
+                    var currentDeployment = activeDeployments.FirstOrDefault(
+                        x => x.Vehicle == deployment.Vehicle &&
+                        x.StartTime == deployment.StartTime
+                    );
                     if (currentDeployment != null)
                     {
                         currentDeployments += 1;
-                        // if there is, update LastSeen
-                        currentDeployment.LastSeen = now;
-                        // only other thing that we should track as changed is a possible end time
-                        currentDeployment.EndTime = item.EndTime.ToDateTime();
-                        await HttpClient.PutAsJsonAsync<API.Models.DeploymentDTO>($"deployment/{currentDeployment.Key}", currentDeployment);
                         // remove from active list
                         activeDeployments.Remove(currentDeployment);
+                        currentDeployment.LastSeen = now;
+                        // only other thing that we should track as changed is a possible end time
+                        currentDeployment.EndTime = deployment.EndTime;
+                        response = await HttpClient.PutAsJsonAsync<API.Models.DeploymentDTO>($"deployment/{currentDeployment.Key}", currentDeployment);
+                        response.EnsureSuccessStatusCode();
                     }
                     else
                     {
@@ -87,13 +90,14 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         deployment.PatternAreaKey = (await patternAreaTask)?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;
-                        await HttpClient.PostAsJsonAsync("deployment", deployment);
+                        response = await HttpClient.PostAsJsonAsync("deployment", deployment);
+                        response.EnsureSuccessStatusCode();
                     }
                 }
                 catch (Exception e)
                 {
                     // this might be because we are seeing something for the first time
-                    Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                    Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
                 }
             }
 
@@ -104,12 +108,15 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             {
                 try
                 {
-                    await HttpClient.PostAsync($"deployment/{deploymentToEnd.Key}/end", null);
+                    deploymentToEnd.EndTime = now;
+                    deploymentToEnd.LastSeen = now;
+                    response = await HttpClient.PutAsJsonAsync<API.Models.DeploymentDTO>($"deployment/{deploymentToEnd.Key}", deploymentToEnd);
+                    response.EnsureSuccessStatusCode();
                 }
                 catch (Exception e)
                 {
                     // this might be because we are seeing something for the first time
-                    Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                    Logger.LogWarning("Failed to save a deployment record:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
                 }
             }
         }
