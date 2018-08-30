@@ -22,14 +22,6 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             if (response.IsSuccessStatusCode)
             {
                 var availability = await response.DeserializeJson(new List<DeploymentDTO>());
-                availability.ForEach(deployment =>
-                {
-                    // flip the coordinates
-                    deployment.Location = new Point(new Position(
-                        deployment.Location.Coordinates.Longitude,
-                        deployment.Location.Coordinates.Latitude
-                    ));
-                });
                 return new Queue<DeploymentDTO>(availability);
             }
 
@@ -72,29 +64,6 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 try
                 {
                     var trips = await response.DeserializeJson(new List<TripDTO>());
-                    trips.ForEach(trip =>
-                    {
-                        // flip the coordinates
-                        trip.StartPoint = new Point(new Position(
-                                trip.StartPoint.Coordinates.Longitude,
-                                trip.StartPoint.Coordinates.Latitude
-                            ));
-
-                        trip.EndPoint = new Point(new Position(
-                            trip.StartPoint.Coordinates.Longitude,
-                            trip.StartPoint.Coordinates.Latitude
-                        ));
-
-                        var route = new List<IPosition>();
-                        trip.Route.Coordinates.ToAsyncEnumerable().ForEach(position =>
-                        {
-                            route.Add(new Position(
-                                position.Longitude,
-                                position.Latitude
-                            ));
-                        });
-                        trip.Route = new LineString(route);
-                    });
 
                     return new Queue<TripDTO>(trips);
                 }

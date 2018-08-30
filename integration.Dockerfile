@@ -4,6 +4,7 @@ WORKDIR /app
 # copy csproj and restore as distinct layers
 COPY scootertown.integration/*.csproj ./scootertown.integration/
 COPY scootertown.data/*.csproj ./scootertown.data/
+COPY scootertown.api/*.csproj ./scootertown.api/
 WORKDIR /app/scootertown.integration
 RUN dotnet restore
 
@@ -11,6 +12,10 @@ RUN dotnet restore
 WORKDIR /app
 COPY scootertown.integration/. ./scootertown.integration/
 COPY scootertown.data/. ./scootertown.data/
+COPY scootertown.api/. ./scootertown.api/
+ADD ./appsettings.json .
+ADD ./neighborhoods.json .
+ADD ./pattern_areas.json .
 WORKDIR /app/scootertown.integration
 RUN dotnet publish -c Release -o out
 

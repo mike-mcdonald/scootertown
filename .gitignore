@@ -17,6 +17,8 @@ trips.json
 neighborhoods.json
 ## derived from above for now
 eastportland.json
+## layer manager/zoning codes/portland pattern areas
+pattern_areas.json
 
 # User-specific files
 *.suo

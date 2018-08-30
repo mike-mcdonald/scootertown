@@ -82,12 +82,14 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 
         public async Task<List<Deployment>> GetActive() =>
             await Context.Set<Deployment>()
+                .Include(x => x.Vehicle)
                 .Where(x => x.EndDateKey == null)
                 .ToAsyncEnumerable()
                 .ToList();
 
         public async Task<List<Deployment>> GetActive(string companyName) =>
             await Context.Set<Deployment>()
+                .Include(x => x.Vehicle)
                 .Where(x => x.EndDateKey == null)
                 .Where(x => x.Company.Name == companyName)
                 .ToAsyncEnumerable()

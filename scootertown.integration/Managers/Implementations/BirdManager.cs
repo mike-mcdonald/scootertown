@@ -65,11 +65,10 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var limit = 500;
             var trips = new Queue<TripDTO>();
 
-            var response = await Client.GetAsync($"trips?limit={limit}&offset={Offset}");
+            var response = await Client.GetAsync($"trips?limit={limit}&offset={offset}");
             if (response.IsSuccessStatusCode)
             {
                 trips = (await response.DeserializeJson(new { trips = new Queue<TripDTO>() })).trips;
-                Offset += trips.Count;
             }
             else
             {

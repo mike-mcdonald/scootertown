@@ -41,9 +41,7 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Common
             builder.UseInMemoryDatabase("Intregration");
             options = builder.Options;
 
-            var loggerFactory = new LoggerFactory();
-
-            var context = new ScootertownDbContext(loggerFactory.CreateLogger<ScootertownDbContext>(), options, new VehicleStoreOptions());
+            var context = new ScootertownDbContext(options, new VehicleStoreOptions());
 
             NeighborhoodRepository = new NeighborhoodRepository(context);
             PatternAreaRepository = new PatternAreaRepository(context);

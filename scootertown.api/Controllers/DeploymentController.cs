@@ -90,36 +90,18 @@ namespace PDX.PBOT.App.API.Controllers
             // need the vehicle so we can test for active deployments
             deployment.VehicleKey = vehicle.Key;
 
-            var activeDeployments = await DeploymentRepository.GetActive();
-            // for this vehicle, is there an active deployment?
-            var currentDeployment = activeDeployments.FirstOrDefault(x => x.VehicleKey == deployment.VehicleKey);
-            if (currentDeployment != null)
-            {
-                // if there is, update LastSeen
-                currentDeployment.LastSeen = now;
-                // only other thing that we should track as changed is a possible end time
-                currentDeployment.EndDateKey = (await endDateTask)?.Key;
-                currentDeployment.EndTime = deployment.EndTime;
-                await DeploymentRepository.Update(currentDeployment, false);
-            }
-            else
-            {
-                // if there isn't start a new one
+            // Get the reference properties set up
+            // write this first so we don't start two operations
+            deployment.EndDateKey = (await endDateTask)?.Key;
 
-                // Get the reference properties set up
+            var companyTask = CompanyRepository.Find(value.Company);
+            var startDateTask = CalendarRepository.Find(value.StartTime);
 
-                // write this first so we don't start two operations
-                deployment.EndDateKey = (await endDateTask)?.Key;
+            deployment.CompanyKey = (await companyTask).Key;
+            deployment.StartDateKey = (await startDateTask).Key;
 
-                var companyTask = CompanyRepository.Find(value.Company);
-                var startDateTask = CalendarRepository.Find(value.StartTime);
-
-                deployment.CompanyKey = (await companyTask).Key;
-                deployment.StartDateKey = (await startDateTask).Key;
-
-                deployment.FirstSeen = deployment.LastSeen = now;
-                await DeploymentRepository.Add(deployment, false);
-            }
+            deployment.FirstSeen = deployment.LastSeen = now;
+            await DeploymentRepository.Add(deployment, false);
 
             try
             {

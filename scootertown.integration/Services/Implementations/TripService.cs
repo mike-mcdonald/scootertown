@@ -23,7 +23,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public TripService(
             ILogger<TripService> logger,
-            IOptions<APIOptions> options,
+            APIOptions options,
             INeighborhoodRepository neighborhoodRepository,
             IPatternAreaRepository patternAreaRepository
         )
@@ -32,7 +32,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             PatternAreaRepository = patternAreaRepository;
 
             HttpClient = new HttpClient();
-            HttpClient.BaseAddress = new Uri(options.Value.BaseAddress);
+            HttpClient.BaseAddress = new Uri(options.BaseAddress);
         }
 
         public async Task<long> GetTotalTrips(string companyName)

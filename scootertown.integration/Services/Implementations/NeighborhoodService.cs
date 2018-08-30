@@ -21,11 +21,11 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public NeighborhoodService(
             INeighborhoodRepository neighborhoodRepository,
-            IOptions<AreasOfInterest> optionsAccessor
+            AreasOfInterest options
         )
         {
             NeighborhoodRepository = neighborhoodRepository;
-            AreasOfInterest = optionsAccessor.Value;
+            AreasOfInterest = options;
         }
 
         public async Task Save() =>
