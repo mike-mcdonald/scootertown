@@ -11,7 +11,6 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
 {
     public class ScootertownDbContext : DbContext
     {
-        private readonly ILogger Logger;
         readonly VehicleStoreOptions StoreOptions;
         // Dimensions
         public DbSet<Calendar> Calendar { get; set; }
@@ -29,12 +28,9 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
 
 
         public ScootertownDbContext(
-            ILogger<ScootertownDbContext> logger,
             DbContextOptions<ScootertownDbContext> options,
             VehicleStoreOptions storeOptions) : base(options)
         {
-            Logger = logger;
-            Logger.LogTrace("Creating context object...");
             this.StoreOptions = storeOptions ?? throw new ArgumentNullException(nameof(storeOptions));
         }
 
@@ -60,12 +56,6 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public Task<int> SaveChangesAsync()
         {
             return base.SaveChangesAsync();
-        }
-
-        public override void Dispose()
-        {
-            Logger.LogTrace("Disposing context...");
-            base.Dispose();
         }
     }
 }
