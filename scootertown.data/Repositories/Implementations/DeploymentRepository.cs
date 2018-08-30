@@ -31,7 +31,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
             }
             else
             {
-                existingItem.LastSeen = DateTime.Now;
+                existingItem.LastSeen = item.LastSeen;
                 return await Update(existingItem);
             }
         }
@@ -83,6 +83,9 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
         public async Task<List<Deployment>> GetActive() =>
             await Context.Set<Deployment>()
                 .Include(x => x.Vehicle)
+                .Include(x => x.Company)
+                .Include(x => x.StartDate)
+                .Include(x => x.EndDate)
                 .Where(x => x.EndDateKey == null)
                 .ToAsyncEnumerable()
                 .ToList();
@@ -90,6 +93,9 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
         public async Task<List<Deployment>> GetActive(string companyName) =>
             await Context.Set<Deployment>()
                 .Include(x => x.Vehicle)
+                .Include(x => x.Company)
+                .Include(x => x.StartDate)
+                .Include(x => x.EndDate)
                 .Where(x => x.EndDateKey == null)
                 .Where(x => x.Company.Name == companyName)
                 .ToAsyncEnumerable()
