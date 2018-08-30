@@ -74,16 +74,6 @@ namespace PDX.PBOT.Scootertown.Integration
                 Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
             }
 
-            // set up the offsets to pick up where we left off
-            foreach (var manager in Managers)
-            {
-                using (AsyncScopedLifestyle.BeginScope(Container))
-                {
-                    var tripService = Container.GetInstance<ITripService>();
-                    manager.StartingOffset = await tripService.GetTotalTrips(manager.Company);
-                }
-            }
-
             deploymentTimer = new Timer(obj =>
             {
                 foreach (var manager in Managers)
