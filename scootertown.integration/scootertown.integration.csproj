@@ -27,7 +27,6 @@
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="Always" />
     <Content Include="../appsettings.json" CopyToOutputDirectory="Always" />
-    <Content Include="../eastportland.json" CopyToOutputDirectory="Always" />
     <Content Include="../neighborhoods.json" CopyToOutputDirectory="Always" />
     <Content Include="../pattern_areas.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
