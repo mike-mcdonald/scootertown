@@ -82,25 +82,8 @@ namespace PDX.PBOT.App.API.Controllers
         {
             var now = DateTime.Now;
 
-            var deployment = Mapper.Map<Deployment>(value);
+            var deployment = await FillDeployment(value);
 
-            var vehicle = await VehicleRepository.Find(value.Vehicle) ?? await VehicleRepository.Add(new Vehicle { Name = value.Vehicle });
-            var endDateTask = value.EndTime.HasValue ? CalendarRepository.Find(value.EndTime.Value) : Task.FromResult<Calendar>(null);
-
-            // need the vehicle so we can test for active deployments
-            deployment.VehicleKey = vehicle.Key;
-
-            // Get the reference properties set up
-            // write this first so we don't start two operations
-            deployment.EndDateKey = (await endDateTask)?.Key;
-
-            var companyTask = CompanyRepository.Find(value.Company);
-            var startDateTask = CalendarRepository.Find(value.StartTime);
-
-            deployment.CompanyKey = (await companyTask).Key;
-            deployment.StartDateKey = (await startDateTask).Key;
-
-            deployment.FirstSeen = deployment.LastSeen = now;
             await DeploymentRepository.Add(deployment, false);
 
             try
@@ -109,7 +92,7 @@ namespace PDX.PBOT.App.API.Controllers
             }
             catch (Exception e)
             {
-                Logger.LogError("Error adding deployment:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                Logger.LogError("Error adding deployment:\n{message}", e.Message);
                 return BadRequest(e.ToString());
             }
             return Ok(Mapper.Map<DeploymentDTO>(deployment));
@@ -117,8 +100,20 @@ namespace PDX.PBOT.App.API.Controllers
 
         // PUT api/deployment/5
         [HttpPut("{key}")]
-        public void Update(long key, [FromBody]DeploymentDTO value)
+        public async Task<IActionResult> Update(long key, [FromBody]DeploymentDTO value)
         {
+            try
+            {
+                var deployment = await FillDeployment(value);
+
+                await DeploymentRepository.Update(deployment);
+                return Ok(Mapper.Map<DeploymentDTO>(deployment));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Error updating deployment:\n{message}", e.Message);
+                return BadRequest(e.ToString());
+            }
         }
 
         // POST api/deployment/5/end
@@ -144,6 +139,29 @@ namespace PDX.PBOT.App.API.Controllers
                 return BadRequest(e.ToString());
             }
 
+        }
+
+        private async Task<Deployment> FillDeployment(DeploymentDTO value)
+        {
+            var deployment = Mapper.Map<Deployment>(value);
+
+            var vehicle = await VehicleRepository.Find(value.Vehicle) ?? await VehicleRepository.Add(new Vehicle { Name = value.Vehicle });
+            var endDateTask = value.EndTime.HasValue ? CalendarRepository.Find(value.EndTime.Value) : Task.FromResult<Calendar>(null);
+
+            // need the vehicle so we can test for active deployments
+            deployment.VehicleKey = vehicle.Key;
+
+            // Get the reference properties set up
+            // write this first so we don't start two operations
+            deployment.EndDateKey = (await endDateTask)?.Key;
+
+            var companyTask = CompanyRepository.Find(value.Company);
+            var startDateTask = CalendarRepository.Find(value.StartTime);
+
+            deployment.CompanyKey = (await companyTask).Key;
+            deployment.StartDateKey = (await startDateTask).Key;
+
+            return deployment;
         }
     }
 }
