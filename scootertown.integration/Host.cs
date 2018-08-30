@@ -140,11 +140,13 @@ namespace PDX.PBOT.Scootertown.Integration
                                 {
                                     Logger.LogDebug("Retrieving trips for {Company}.", manager.Company);
 
-                                    var trips = await manager.RetrieveTrips();
-
                                     using (AsyncScopedLifestyle.BeginScope(Container))
                                     {
                                         var tripService = Container.GetInstance<ITripService>();
+
+                                        var offset = await tripService.GetTotalTrips(manager.Company);
+
+                                        var trips = await manager.RetrieveTrips(offset);
 
                                         Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 

@@ -15,18 +15,12 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
     public abstract class CompanyManagerBase : ICompanyManager
     {
         protected readonly string CompanyName;
-        protected long Offset;
         protected readonly HttpClient Client;
         protected readonly JsonSerializerSettings JsonSettings;
 
         public string Company
         {
             get => CompanyName;
-        }
-
-        public long StartingOffset
-        {
-            set => Offset = value;
         }
 
         public CompanyManagerBase(string name, IConfigurationSection configuration)

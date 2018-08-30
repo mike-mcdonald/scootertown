@@ -64,13 +64,12 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
         public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
         {
             var trips = new Queue<TripDTO>();
-            var page = Offset / 500 + 1;
+            var page = offset / 500;
 
             var response = await Client.GetAsync($"trips?page={page}");
             if (response.IsSuccessStatusCode)
             {
                 trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
-                Offset += trips.Count;
             }
             else
             {
