@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using PDX.PBOT.Scootertown.Integration.Managers;
 using PDX.PBOT.Scootertown.Integration.Managers.Interfaces;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
+using SimpleInjector;
+using SimpleInjector.Lifestyles;
 
 namespace PDX.PBOT.Scootertown.Integration
 {
@@ -17,7 +19,7 @@ namespace PDX.PBOT.Scootertown.Integration
         private Timer deploymentTimer;
         private Timer tripTimer;
         private readonly ILogger Logger;
-        private readonly IServiceProvider ServiceProvider;
+        private readonly Container Container;
         private readonly List<ICompanyManager> Managers = new List<ICompanyManager>();
         private readonly Dictionary<string, bool> TripQueryLock = new Dictionary<string, bool>();
         private readonly Dictionary<string, bool> DeploymentQueryLock = new Dictionary<string, bool>();
@@ -25,11 +27,11 @@ namespace PDX.PBOT.Scootertown.Integration
         public Host(
             IConfiguration configuration,
             ILogger<Host> logger,
-            IServiceProvider serviceProvider
+            Container container
         )
         {
             Logger = logger;
-            ServiceProvider = serviceProvider;
+            Container = container;
 
             var companySettings = configuration.GetSection("CompanySettings");
 
@@ -49,7 +51,10 @@ namespace PDX.PBOT.Scootertown.Integration
             Logger.LogDebug("Reading neighborhoods...");
             try
             {
-                await ServiceProvider.GetRequiredService<INeighborhoodService>().Save();
+                using (AsyncScopedLifestyle.BeginScope(Container))
+                {
+                    await Container.GetInstance<INeighborhoodService>().Save();
+                }
             }
             catch (Exception e)
             {
@@ -59,7 +64,10 @@ namespace PDX.PBOT.Scootertown.Integration
             Logger.LogDebug("Reading pattern areas...");
             try
             {
-                await ServiceProvider.GetRequiredService<IPatternAreaService>().Save();
+                using (AsyncScopedLifestyle.BeginScope(Container))
+                {
+                    await Container.GetInstance<IPatternAreaService>().Save();
+                }
             }
             catch (Exception e)
             {
@@ -69,8 +77,11 @@ namespace PDX.PBOT.Scootertown.Integration
             // set up the offsets to pick up where we left off
             foreach (var manager in Managers)
             {
-                var tripService = ServiceProvider.GetRequiredService<ITripService>();
-                manager.StartingOffset = await tripService.GetTotalTrips(manager.Company);
+                using (AsyncScopedLifestyle.BeginScope(Container))
+                {
+                    var tripService = Container.GetInstance<ITripService>();
+                    manager.StartingOffset = await tripService.GetTotalTrips(manager.Company);
+                }
             }
 
             deploymentTimer = new Timer(obj =>
@@ -89,11 +100,14 @@ namespace PDX.PBOT.Scootertown.Integration
 
                                 var deployments = await manager.RetrieveAvailability();
 
-                                var deploymentService = ServiceProvider.GetRequiredService<IDeploymentService>();
+                                using (AsyncScopedLifestyle.BeginScope(Container))
+                                {
+                                    var deploymentService = Container.GetInstance<IDeploymentService>();
 
-                                Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
+                                    Logger.LogDebug("Writing {count} availability records for {Company}.", deployments.Count, manager.Company);
 
-                                await deploymentService.Save(manager.Company, deployments);
+                                    await deploymentService.Save(manager.Company, deployments);
+                                }
 
                                 Logger.LogDebug("Done writing availability records for {Company}.", manager.Company);
                             }
@@ -128,11 +142,14 @@ namespace PDX.PBOT.Scootertown.Integration
 
                                     var trips = await manager.RetrieveTrips();
 
-                                    var tripService = ServiceProvider.GetRequiredService<ITripService>();
+                                    using (AsyncScopedLifestyle.BeginScope(Container))
+                                    {
+                                        var tripService = Container.GetInstance<ITripService>();
 
-                                    Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
+                                        Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 
-                                    await tripService.Save(manager.Company, trips);
+                                        await tripService.Save(manager.Company, trips);
+                                    }
 
                                     Logger.LogDebug("Done writing trip records for {Company}.", manager.Company);
                                 }

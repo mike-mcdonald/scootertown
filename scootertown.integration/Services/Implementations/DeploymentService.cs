@@ -26,7 +26,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public DeploymentService(
             ILogger<DeploymentService> logger,
-            IOptions<APIOptions> options,
+            APIOptions options,
             INeighborhoodRepository neighborhoodRepository,
             IPatternAreaRepository patternAreaRepository
         )
@@ -36,7 +36,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             PatternAreaRepository = patternAreaRepository;
 
             HttpClient = new HttpClient();
-            HttpClient.BaseAddress = new Uri(options.Value.BaseAddress);
+            HttpClient.BaseAddress = new Uri(options.BaseAddress);
         }
 
         public async Task Save(string company, Queue<Integration.Models.DeploymentDTO> items)
@@ -98,7 +98,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             }
 
             Logger.LogDebug($"Found {currentDeployments} existing deployments and {newDeployments} new deployments.");
-
+            Logger.LogDebug($"Ending {activeDeployments.Count} deployments.");
             // for all the other active deployments that we didn't see, update the end time to now
             foreach (var deploymentToEnd in activeDeployments)
             {

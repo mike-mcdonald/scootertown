@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog.Config;
 using NLog.Extensions.Logging;
 using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Options;
@@ -21,11 +22,47 @@ using PDX.PBOT.Scootertown.Integration.Mappings;
 using PDX.PBOT.Scootertown.Integration.Options;
 using PDX.PBOT.Scootertown.Integration.Services.Implementations;
 using PDX.PBOT.Scootertown.Integration.Services.Interfaces;
+using SimpleInjector;
+using SimpleInjector.Lifestyles;
 
 namespace PDX.PBOT.Scootertown.Integration
 {
+    public class LoggingAdapter<T> : ILogger<T>
+    {
+        private readonly ILogger adaptee;
+
+        public LoggingAdapter(ILoggerFactory factory)
+        {
+            adaptee = factory.CreateLogger<T>();
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            return adaptee.BeginScope(state);
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return adaptee.IsEnabled(logLevel);
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            adaptee.Log(logLevel, eventId, state, exception, formatter);
+        }
+    }
+
     class Program
     {
+        private static ILoggerFactory ConfigureLogger()
+        {
+            LoggerFactory factory = new LoggerFactory();
+
+            factory.AddNLog();
+
+            return factory;
+        }
+
         static async Task Main(string[] args)
         {
             var pathToContentRoot = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -46,54 +83,80 @@ namespace PDX.PBOT.Scootertown.Integration
                     // AutoMapper setup using profiles.
                     Mapper.Initialize(cfg =>
                     {
-                        cfg.AddProfile(typeof(DeploymentProfile));
-                        cfg.AddProfile(typeof(TripProfile));
-                        cfg.AddProfile(typeof(GeoJsonProfile));
+                        cfg.AddProfile<DeploymentProfile>();
+                        cfg.AddProfile<TripProfile>();
+                        cfg.AddProfile<NeighborhoodProfile>();
+                        cfg.AddProfile<PatternAreaProfile>();
+                        cfg.AddProfile<GeoJsonProfile>();
                     });
 
-                    services.Configure<AreasOfInterest>(config =>
+                    // use a different container with more features than the default .NET Core one
+                    var container = new Container();
+                    container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
+
+                    container.Register<ScootertownDbContext>(() =>
                     {
-                        config.NeighborhoodsFile = Path.Combine(
-                            context.HostingEnvironment.ContentRootPath,
-                            context.Configuration.GetValue<string>("NeighborhoodsFile")
+                        var builder = new DbContextOptionsBuilder<ScootertownDbContext>();
+                        builder.UseNpgsql(
+                            context.Configuration.GetConnectionString("postgres"),
+                            o => o.UseNetTopologySuite()
                         );
-                        config.PatternAreasFile = Path.Combine(
-                            context.HostingEnvironment.ContentRootPath,
-                            context.Configuration.GetValue<string>("PatternAreasFile")
-                        );
-                    });
+                        var options = builder.Options;
 
-                    services.Configure<APIOptions>(config =>
+                        var dbContext = new ScootertownDbContext(
+                            options,
+                            new VehicleStoreOptions());
+
+                        return dbContext;
+                    }, Lifestyle.Scoped);
+
+                    container.Register<AreasOfInterest>(() =>
                     {
-                        config.BaseAddress = context.Configuration.GetValue<string>("BaseAddress");
-                    });
-
-                    // database table options
-                    var storeOptions = new VehicleStoreOptions();
-                    services.AddSingleton(storeOptions);
-
-                    // transient so I can create multiple services for each company
-                    services
-                        .AddEntityFrameworkNpgsql()
-                        .AddDbContext<ScootertownDbContext>(options =>
+                        var options = new AreasOfInterest
                         {
-                            options.UseNpgsql(
-                                context.Configuration.GetConnectionString("postgres"),
-                                o => o.UseNetTopologySuite()
-                            );
-                        }, ServiceLifetime.Transient);
+                            NeighborhoodsFile = Path.Combine(
+                                context.HostingEnvironment.ContentRootPath,
+                                context.Configuration.GetValue<string>("NeighborhoodsFile")
+                            ),
+                            PatternAreasFile = Path.Combine(
+                                context.HostingEnvironment.ContentRootPath,
+                                context.Configuration.GetValue<string>("PatternAreasFile")
+                            )
+                        };
+                        return options;
+                    }, Lifestyle.Scoped);
+
+                    container.Register<APIOptions>(() =>
+                    {
+                        var options = new APIOptions
+                        {
+                            BaseAddress = context.Configuration.GetValue<string>("BaseAddress")
+                        };
+
+                        return options;
+                    }, Lifestyle.Scoped);
 
                     // add generic services for repositories for any geojson we'll read in
-                    services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
-                    services.AddTransient<IPatternAreaRepository, PatternAreaRepository>();
+                    container.Register<INeighborhoodRepository, NeighborhoodRepository>(Lifestyle.Scoped);
+                    container.Register<IPatternAreaRepository, PatternAreaRepository>(Lifestyle.Scoped);
 
-                    services.AddTransient<ITripService, TripService>();
-                    services.AddTransient<IDeploymentService, DeploymentService>();
-                    services.AddTransient<INeighborhoodService, NeighborhoodService>();
-                    services.AddTransient<IPatternAreaService, PatternAreaService>();
+                    container.Register<ITripService, TripService>(Lifestyle.Scoped);
+                    container.Register<IDeploymentService, DeploymentService>(Lifestyle.Scoped);
+                    container.Register<INeighborhoodService, NeighborhoodService>(Lifestyle.Scoped);
+                    container.Register<IPatternAreaService, PatternAreaService>(Lifestyle.Scoped);
+
+                    container.Register(ConfigureLogger, Lifestyle.Singleton);
+
+                    container.Register(typeof(ILogger<>), typeof(LoggingAdapter<>), Lifestyle.Scoped);
+
+                    container.Verify();
+
+                    // use the default DI to manage our new container
+                    services.AddSingleton(container);
 
                     services.AddSingleton<ILoggerFactory, LoggerFactory>();
 
+                    // tell the DI container to start the application
                     services.AddSingleton<IHostedService, Host>();
                 })
                 .ConfigureLogging((context, logging) =>

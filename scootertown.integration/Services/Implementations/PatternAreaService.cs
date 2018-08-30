@@ -21,11 +21,11 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
         public PatternAreaService(
             IPatternAreaRepository patternAreaRepository,
-            IOptions<AreasOfInterest> optionsAccessor
+            AreasOfInterest options
         )
         {
             PatternAreaRepository = patternAreaRepository;
-            AreasOfInterest = optionsAccessor.Value;
+            AreasOfInterest = options;
         }
 
         public async Task Save() =>
