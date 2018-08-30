@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PDX.PBOT.Scootertown.Data.Extensions
 {
@@ -273,6 +274,13 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.HasOne(x => x.NeighborhoodStart).WithMany(x => x.TripsStarted).HasForeignKey(x => x.NeighborhoodStartKey);
                 trip.HasOne(x => x.NeighborhoodEnd).WithMany(x => x.TripsEnded).HasForeignKey(x => x.NeighborhoodEndKey);
             });
+
+            // transform everything to lowercase
+            // PostgreSQL prefers everything lowercase by default
+            modelBuilder.Model.GetEntityTypes()
+                .SelectMany(e => e.GetProperties())
+                .ToList()
+                .ForEach(p => p.Relational().ColumnName = p.Name.ToLower());
         }
 
         public static void SeedData(this ModelBuilder modelBuilder)

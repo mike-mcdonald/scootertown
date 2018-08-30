@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -10,15 +11,16 @@ using PDX.PBOT.Scootertown.Data.Concrete;
 namespace PDX.PBOT.Scootertown.Data.Migrations
 {
     [DbContext(typeof(ScootertownDbContext))]
-    partial class ScootertownDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180828222348_LowercaseNames")]
+    partial class LowercaseNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:PostgresExtension:postgis", "'postgis', '', ''")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
+                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("PDX.PBOT.Scootertown.Data.Models.Dimensions.Calendar", b =>
@@ -4868,7 +4870,6 @@ namespace PDX.PBOT.Scootertown.Data.Migrations
                         .IsRequired()
                         .HasColumnName("alternatekey");
 
-
                     b.Property<Geometry>("Geometry")
                         .HasColumnName("geometry");
 
@@ -4911,27 +4912,6 @@ namespace PDX.PBOT.Scootertown.Data.Migrations
                         .HasAnnotation("Npgsql:IndexMethod", "gist");
 
                     b.ToTable("patternarea","dim");
-                });
-
-            modelBuilder.Entity("PDX.PBOT.Scootertown.Data.Models.Dimensions.PatternArea", b =>
-                {
-                    b.Property<int>("Key")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("AlternateKey");
-
-                    b.Property<Geometry>("Geometry");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200);
-
-                    b.HasKey("Key");
-
-                    b.HasIndex("Geometry")
-                        .HasAnnotation("Npgsql:IndexMethod", "gist");
-
-                    b.ToTable("PatternArea","Dim");
                 });
 
             modelBuilder.Entity("PDX.PBOT.Scootertown.Data.Models.Dimensions.PaymentType", b =>
@@ -5133,7 +5113,7 @@ namespace PDX.PBOT.Scootertown.Data.Migrations
                     b.Property<int?>("EndDateKey")
                         .HasColumnName("enddatekey");
 
-                    b.Property<TimeSpan?>("EndTime")
+                    b.Property<TimeSpan>("EndTime")
                         .HasColumnName("endtime");
 
                     b.Property<DateTime>("FirstSeen")
