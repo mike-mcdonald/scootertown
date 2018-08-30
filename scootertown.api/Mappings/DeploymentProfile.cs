@@ -12,7 +12,7 @@ namespace PDX.PBOT.Scootertown.API.Mappings
         {
             CreateMap<Deployment, DeploymentDTO>()
                 .ForMember(d => d.Company, opt => opt.MapFrom(s => s.Company.Name))
-                .ForMember(d => d.VehicleType, opt => opt.MapFrom(s => s.VehicleType.Name))
+                .ForMember(d => d.VehicleType, opt => opt.MapFrom(s => s.VehicleTypeKey))
                 .ForMember(d => d.Vehicle, opt => opt.MapFrom(s => s.Vehicle.Name))
                 .ForMember(d => d.Location, opt => opt.MapFrom(s => s.Location.ToGeoJson<GeoJSON.Net.Geometry.Point>()))
                 .ForMember(d => d.Neighborhood, opt => opt.MapFrom(s => s.NeighborhoodKey))
