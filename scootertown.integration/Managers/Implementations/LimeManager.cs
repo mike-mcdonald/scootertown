@@ -15,7 +15,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
         {
-            var page = 1;
+            var page = 0;
             var total = new List<DeploymentDTO>();
             var current = new List<DeploymentDTO>();
             do
@@ -30,6 +30,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                 {
                     throw new Exception($"Error retrieving availability for {CompanyName}");
                 }
+                page += 1;
             } while (current.Count > 0);
 
             return new Queue<DeploymentDTO>(total);
