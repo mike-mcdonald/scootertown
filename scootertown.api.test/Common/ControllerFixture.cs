@@ -18,10 +18,12 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
     {
         public readonly ScootertownDbContext Context;
         public readonly DeploymentRepository DeploymentRepository;
+        public readonly TripRepository TripRepository;
         public readonly CalendarRepository CalendarRepository;
         public readonly CompanyRepository CompanyRepository;
         public readonly NeighborhoodRepository NeighborhoodRepository;
         public readonly PatternAreaRepository PatternAreaRepository;
+        public readonly PaymentTypeRepository PaymentTypeRepository;
         public readonly PlacementReasonRepository PlacementReasonRepository;
         public readonly RemovalReasonRepository RemovalReasonRepository;
         public readonly VehicleRepository VehicleRepository;
@@ -32,6 +34,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
             Mapper.Initialize(cfg =>
             {
                 cfg.AddProfile<DeploymentProfile>();
+                cfg.AddProfile<TripProfile>();
             });
 
 
@@ -43,10 +46,12 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
             var context = new ScootertownDbContext(options, new VehicleStoreOptions());
 
             DeploymentRepository = new DeploymentRepository(context);
+            TripRepository = new TripRepository(context);
             CalendarRepository = new CalendarRepository(context);
             CompanyRepository = new CompanyRepository(context);
             NeighborhoodRepository = new NeighborhoodRepository(context);
             PatternAreaRepository = new PatternAreaRepository(context);
+            PaymentTypeRepository = new PaymentTypeRepository(context);
             PlacementReasonRepository = new PlacementReasonRepository(context);
             RemovalReasonRepository = new RemovalReasonRepository(context);
             VehicleRepository = new VehicleRepository(context);
