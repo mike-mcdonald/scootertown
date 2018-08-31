@@ -13,6 +13,8 @@ appsettings.json
 # Large files, noting where to download
 ## npm run download
 trips.json
+## node availability.js
+availability.json
 ## http://gis-pdx.opendata.arcgis.com/datasets/neighborhoods-regions
 neighborhoods.json
 ## derived from above for now
