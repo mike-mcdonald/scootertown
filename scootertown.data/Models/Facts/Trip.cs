@@ -14,6 +14,8 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public string AlternateKey { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
+        public DateTime FirstSeen { get; set; }
+        public DateTime LastSeen { get; set; }
         public Point StartPoint { get; set; }
         public Point EndPoint { get; set; }
         public LineString Route { get; set; }

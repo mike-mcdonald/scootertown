@@ -304,6 +304,8 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.Property(x => x.AlternateKey).HasMaxLength(50).IsRequired();
                 trip.Property(x => x.StartTime);
                 trip.Property(x => x.EndTime);
+                trip.Property(x => x.FirstSeen);
+                trip.Property(x => x.LastSeen);
                 trip.Property(x => x.StartPoint);
                 trip.Property(x => x.EndPoint);
                 trip.Property(x => x.Route);

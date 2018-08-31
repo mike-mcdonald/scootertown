@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Options;
@@ -29,6 +30,32 @@ namespace PDX.PBOT.Scootertown.Data.Tests.Repositories
             //Then
             Assert.NotNull(trip);
             Assert.Equal(1, trip.Key);
+        }
+
+        [Fact]
+        public async void ShouldUpdateSameTrip()
+        {
+            //Given
+            var trip = Trips[0];
+            //When
+            await Repository.Add(trip);
+            var count = await Repository.Count();
+            await Repository.Add(trip);
+            //Then
+            Assert.Equal(count, await Repository.Count());
+        }
+
+        [Fact]
+        public async void ShouldUpdateLastSeen()
+        {
+            //Given
+            var trip = Trips[0];
+            //When
+            var first = (await Repository.Add(trip)).LastSeen;
+            Thread.Sleep(10);
+            var second = (await Repository.Add(trip)).LastSeen;
+            //Then
+            Assert.NotEqual(first, second);
         }
     }
 }
