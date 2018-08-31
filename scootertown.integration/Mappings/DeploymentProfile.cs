@@ -14,7 +14,7 @@ namespace PDX.PBOT.Scootertown.Integration.Mappings
                 .ForMember(d => d.Key, opt => opt.Ignore())
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.StartTime.ToDateTime()))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.EndTime.ToDateTime()))
-                .ForMember(d => d.Location, opt => opt.MapFrom(s => s.Location.FromGeoJson<Point>()))
+                .ForMember(d => d.Location, opt => opt.MapFrom(s => s.Location))
                 .ForMember(d => d.X, opt => opt.MapFrom(s => s.Location.Coordinates.Longitude))
                 .ForMember(d => d.Y, opt => opt.MapFrom(s => s.Location.Coordinates.Latitude));
         }
