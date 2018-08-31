@@ -22,6 +22,9 @@ eastportland.json
 ## layer manager/zoning codes/portland pattern areas
 pattern_areas.json
 
+# Manage migrations on a per-deployment basis
+[Mm]igrations/
+
 # User-specific files
 *.suo
 *.user
