@@ -242,6 +242,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 complaint.Property(x => x.ComplaintTypeKey).IsRequired();
 
                 complaint.HasIndex(x => x.Location);
+                complaint.HasIndex(x => new { x.SubmittedDateKey, x.SubmittedTime, x.ComplaintDetails });
 
                 complaint.HasOne(x => x.SubmittedDate).WithMany(x => x.Complaints).HasForeignKey(x => x.SubmittedDateKey);
                 complaint.HasOne(x => x.Vehicle).WithMany(x => x.Complaints).HasForeignKey(x => x.VehicleKey);
