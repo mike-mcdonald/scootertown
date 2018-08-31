@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,12 +17,11 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public DbSet<VehicleType> Companies { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
         public DbSet<PatternArea> PatternAreas { get; set; }
-        public DbSet<VehicleType> PaymentTypes { get; set; }
-        public DbSet<VehicleType> PlacementReasons { get; set; }
-        public DbSet<VehicleType> RemovalReasons { get; set; }
+        public DbSet<Status> Statuses { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleType> VehicleTypes { get; set; }
         // Facts
+        public DbSet<Collision> Collisions { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Deployment> Deployments { get; set; }
 
@@ -42,6 +41,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
             // Override so I can test
             if (!Database.ProviderName.StartsWith("Npgsql"))
             {
+                modelBuilder.Entity<Collision>(b => b.Ignore(e => e.Location));
                 modelBuilder.Entity<Deployment>(b => b.Ignore(e => e.Location));
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.StartPoint));
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.EndPoint));

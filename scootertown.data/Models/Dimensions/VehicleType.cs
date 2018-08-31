@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,5 +11,6 @@ namespace PDX.PBOT.Scootertown.Data.Models.Dimensions
         public List<Vehicle> Vehicles { get; set; }
         public List<Deployment> Deployments { get; set; }
         public List<Trip> Trips { get; set; }
+        public IEnumerable<Collision> Collisions { get; set; }
     }
 }
