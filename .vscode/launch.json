@@ -5,20 +5,51 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "Launch API",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/scootertown.api/bin/Debug/netcoreapp2.1/PDX.PBOT.Scootertown.API.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false,
+            "launchBrowser": {
+                "enabled": false,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceRoot}/Views"
+            }
+        },
+        {
+            "name": "Launch integration",
             "type": "coreclr",
             "request": "launch",
             "program": "${workspaceRoot}/scootertown.integration/bin/Debug/netcoreapp2.1/PDX.PBOT.Scootertown.Integration.dll",
             "args": [],
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceRoot}/scootertown.integration/bin/Debug/netcoreapp2.1/",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "internalConsole",
+            "preLaunchTask": "build"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/trips.js"
+            "program": "${workspaceFolder}/availability.js"
         }
     ]
 }
