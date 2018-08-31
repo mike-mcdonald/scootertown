@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,9 +14,13 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         readonly VehicleStoreOptions StoreOptions;
         // Dimensions
         public DbSet<Calendar> Calendar { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<ComplaintType> ComplaintTypes { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
         public DbSet<PatternArea> PatternAreas { get; set; }
+        public DbSet<PaymentType> PaymentTypes { get; set; }
+        public DbSet<PlacementReason> PlacementReasons { get; set; }
+        public DbSet<RemovalReason> RemovalReasons { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleType> VehicleTypes { get; set; }
