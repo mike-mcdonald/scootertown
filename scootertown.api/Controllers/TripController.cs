@@ -114,7 +114,7 @@ namespace PDX.PBOT.App.API.Controllers
             }
             catch (Exception e)
             {
-                Logger.LogError("Error adding deployment:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                Logger.LogError("Error adding deployment:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
                 return BadRequest(e.ToString());
             }
             return Ok(Mapper.Map<TripDTO>(trip));
