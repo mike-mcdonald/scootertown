@@ -58,7 +58,7 @@ namespace PDX.PBOT.Scootertown.Integration
             }
             catch (Exception e)
             {
-                Logger.LogError("Caught exception reading neighborhood data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                Logger.LogError("Caught exception reading neighborhood data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
             }
 
             Logger.LogDebug("Reading pattern areas...");
@@ -71,7 +71,7 @@ namespace PDX.PBOT.Scootertown.Integration
             }
             catch (Exception e)
             {
-                Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException.Message);
+                Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
             }
 
             deploymentTimer = new Timer(obj =>
