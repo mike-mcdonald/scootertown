@@ -60,15 +60,16 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
+        public override async Task<Queue<TripDTO>> RetrieveTrips()
         {
             var limit = 500;
             var trips = new Queue<TripDTO>();
 
-            var response = await Client.GetAsync($"trips?limit={limit}&offset={offset}");
+            var response = await Client.GetAsync($"trips?limit={limit}&offset={Offset}");
             if (response.IsSuccessStatusCode)
             {
                 trips = (await response.DeserializeJson(new { trips = new Queue<TripDTO>() })).trips;
+                Offset += trips.Count;
             }
             else
             {

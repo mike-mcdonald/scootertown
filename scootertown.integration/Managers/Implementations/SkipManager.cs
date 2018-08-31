@@ -56,7 +56,7 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             throw new Exception($"Error retrieving availability for {CompanyName}");
         }
 
-        public override async Task<Queue<TripDTO>> RetrieveTrips(long offset = 0)
+        public override async Task<Queue<TripDTO>> RetrieveTrips()
         {
             var response = await Client.GetAsync($"trips.json");
             if (response.IsSuccessStatusCode)

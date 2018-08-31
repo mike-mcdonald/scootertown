@@ -7,8 +7,9 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Interfaces
     public interface ICompanyManager
     {
         string Company { get; }
+        long Offset { get; set; }
         Task<Queue<DeploymentDTO>> RetrieveAvailability();
-        Task<Queue<TripDTO>> RetrieveTrips(long offset = 0);
+        Task<Queue<TripDTO>> RetrieveTrips();
         Task<Queue<CollisionDTO>> RetrieveCollisions();
         Task<Queue<ComplaintDTO>> RetrieveComplaints();
     }

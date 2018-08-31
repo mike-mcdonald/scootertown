@@ -136,7 +136,13 @@ namespace PDX.PBOT.Scootertown.Integration
 
                                         var offset = await tripService.GetTotalTrips(manager.Company);
 
-                                        var trips = await manager.RetrieveTrips(offset);
+                                        var trips = await manager.RetrieveTrips();
+
+                                        if (trips.Count == 0)
+                                        {
+                                            Logger.LogDebug("Resetting offset for {company}.", manager.Company);
+                                            manager.Offset = 0;
+                                        }
 
                                         Logger.LogDebug("Writing {count} trip records for {Company}.", trips.Count, manager.Company);
 

@@ -23,6 +23,8 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             get => CompanyName;
         }
 
+        public long Offset { get; set; }
+
         public CompanyManagerBase(string name, IConfigurationSection configuration)
         {
             CompanyName = name;
@@ -39,11 +41,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers
             {
                 Client.DefaultRequestHeaders.Add(setting.Key, setting.Value);
             }
+
+            Offset = 0;
         }
 
         public abstract Task<Queue<DeploymentDTO>> RetrieveAvailability();
         public abstract Task<Queue<CollisionDTO>> RetrieveCollisions();
         public abstract Task<Queue<ComplaintDTO>> RetrieveComplaints();
-        public abstract Task<Queue<TripDTO>> RetrieveTrips(long offset);
+        public abstract Task<Queue<TripDTO>> RetrieveTrips();
     }
 }
