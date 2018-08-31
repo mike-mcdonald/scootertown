@@ -47,6 +47,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
             if (!Database.ProviderName.StartsWith("Npgsql"))
             {
                 modelBuilder.Entity<Collision>(b => b.Ignore(e => e.Location));
+                modelBuilder.Entity<Complaint>(b => b.Ignore(e => e.Location));
                 modelBuilder.Entity<Deployment>(b => b.Ignore(e => e.Location));
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.StartPoint));
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.EndPoint));
