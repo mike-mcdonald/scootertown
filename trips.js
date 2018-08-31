@@ -31,7 +31,7 @@ async function getBirdInfo(settings) {
 }
 
 async function getLimeInfo(settings) {
-  let page = 1;
+  let page = 0;
   let res = {};
   let trips = [];
 
@@ -64,7 +64,6 @@ async function getSkipInfo(settings) {
 
   trips = trips.concat(res.data.reduce(
     (accu, curr) => {
-      curr.start_point.coordinates = curr.start_point.coordinates.reverse();
       accu.push(curr);
       return accu;
     }, [])
@@ -96,14 +95,23 @@ bird.then((trips) => {
   totalTrips = totalTrips.concat(trips);
   console.log('Done reading Bird.');
   callback();
-});
+})
+  .catch((err) => {
+    console.error(JSON.stringify(err));
+  });
 lime.then((trips) => {
   totalTrips = totalTrips.concat(trips);
   console.log('Done reading Lime.');
   callback();
-});
+})
+  .catch((err) => {
+    console.error(JSON.stringify(err));
+  });
 skip.then((trips) => {
   totalTrips = totalTrips.concat(trips);
   console.log('Done reading Skip.');
   callback();
-});
+})
+  .catch((err) => {
+    console.error(JSON.stringify(err));
+  });
