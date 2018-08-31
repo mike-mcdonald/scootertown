@@ -29,11 +29,11 @@ namespace PDX.PBOT.Scootertown.Integration.Test.Mappings
         [Fact]
         public void ShouldMapSample()
         {
-            var trips = new List<Trip>();
+            var trips = new List<API.Models.TripDTO>();
 
             foreach (var trip in Trips)
             {
-                trips.Add(Mapper.Map<Trip>(trip));
+                trips.Add(Mapper.Map<API.Models.TripDTO>(trip));
             }
         }
     }
