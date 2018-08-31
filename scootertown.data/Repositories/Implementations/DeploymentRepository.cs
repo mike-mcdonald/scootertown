@@ -72,8 +72,8 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
             {
                 throw new ArgumentException($"Unable to find entity with Key: {item.Key}");
             }
-            Context.Set<Deployment>().Update(dbItem);
-            dbItem = Mapper.Map(item, dbItem);
+
+            Context.Entry(dbItem).CurrentValues.SetValues(item);
 
             var changes = saveImmediately ? await Context.SaveChangesAsync() : 0;
 

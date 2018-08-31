@@ -37,14 +37,6 @@ namespace PDX.PBOT.Scootertown.Integration.Test
             // Arrange
             Service = fixture.DeploymentService;
 
-            DeploymentRepository = fixture.DeploymentRepository;
-            CalendarRepository = fixture.CalendarRepository;
-            CompanyRepository = fixture.CompanyRepository;
-            PlacementReasonRepository = fixture.PlacementReasonRepository;
-            RemovalReasonRepository = fixture.RemovalReasonRepository;
-            VehicleRepository = fixture.VehicleRepository;
-            VehicleTypeRepository = fixture.VehicleTypeRepository;
-
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new SafeGeoJsonConverter());
 
