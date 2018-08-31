@@ -15,7 +15,7 @@ namespace PDX.PBOT.Scootertown.Data.Tests.Common
         {
             DbContextOptions<ScootertownDbContext> options;
             var builder = new DbContextOptionsBuilder<ScootertownDbContext>();
-            builder.UseInMemoryDatabase("Intregration");
+            builder.UseInMemoryDatabase("Data");
             options = builder.Options;
 
             var context = new ScootertownDbContext(options, new VehicleStoreOptions());
