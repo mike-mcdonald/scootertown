@@ -6,6 +6,7 @@ namespace PDX.PBOT.Scootertown.Data.Options
 
         public TableConfiguration Calendar { get; set; } = new TableConfiguration("calendar", "dim");
         public TableConfiguration Company { get; set; } = new TableConfiguration("company", "dim");
+        public TableConfiguration ComplaintType { get; set; } = new TableConfiguration("complainttype", "dim");
         public TableConfiguration Neighborhood { get; set; } = new TableConfiguration("neighborhood", "dim");
         public TableConfiguration PatternArea { get; set; } = new TableConfiguration("patternarea", "dim");
         public TableConfiguration PaymentType { get; set; } = new TableConfiguration("paymenttype", "dim");

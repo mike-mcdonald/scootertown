@@ -66,6 +66,19 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 company.HasMany(x => x.Deployments).WithOne(x => x.Company);
             });
 
+            modelBuilder.Entity<ComplaintType>(type =>
+            {
+                type.ToTable(storeOptions.ComplaintType);
+
+                type.HasKey(x => x.Key);
+
+                type.Property(x => x.Name).HasMaxLength(200).IsRequired();
+
+                type.HasIndex(x => x.Name).IsUnique();
+
+                type.HasMany(x => x.Complaints).WithOne(x => x.ComplaintType).HasForeignKey(x => x.ComplaintTypeKey);
+            });
+
             modelBuilder.Entity<Neighborhood>(neighborhood =>
             {
                 neighborhood.ToTable(storeOptions.Neighborhood);
@@ -84,21 +97,21 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 neighborhood.HasMany(x => x.TripsEnded).WithOne(x => x.NeighborhoodEnd).HasForeignKey(x => x.NeighborhoodEndKey);
             });
 
-             modelBuilder.Entity<PatternArea>(patternArea =>
-            {
-                patternArea.ToTable(storeOptions.PatternArea);
+            modelBuilder.Entity<PatternArea>(patternArea =>
+           {
+               patternArea.ToTable(storeOptions.PatternArea);
 
-                patternArea.HasKey(x => x.Key);
+               patternArea.HasKey(x => x.Key);
 
-                patternArea.Property(x => x.Name).HasMaxLength(200).IsRequired();
-                patternArea.Property(x => x.Geometry);
+               patternArea.Property(x => x.Name).HasMaxLength(200).IsRequired();
+               patternArea.Property(x => x.Geometry);
 
-                patternArea.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
+               patternArea.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
 
-                patternArea.HasMany(x => x.Deployments).WithOne(x => x.PatternArea).HasForeignKey(x => x.PatternAreaKey);
-                patternArea.HasMany(x => x.TripsStarted).WithOne(x => x.PatternAreaStart).HasForeignKey(x => x.PatternAreaStartKey);
-                patternArea.HasMany(x => x.TripsEnded).WithOne(x => x.PatternAreaEnd).HasForeignKey(x => x.PatternAreaEndKey);
-            });
+               patternArea.HasMany(x => x.Deployments).WithOne(x => x.PatternArea).HasForeignKey(x => x.PatternAreaKey);
+               patternArea.HasMany(x => x.TripsStarted).WithOne(x => x.PatternAreaStart).HasForeignKey(x => x.PatternAreaStartKey);
+               patternArea.HasMany(x => x.TripsEnded).WithOne(x => x.PatternAreaEnd).HasForeignKey(x => x.PatternAreaEndKey);
+           });
 
             modelBuilder.Entity<PaymentType>(type =>
             {
@@ -215,6 +228,26 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 complaint.ToTable(storeOptions.Complaint);
 
                 complaint.HasKey(x => x.Key);
+
+                complaint.Property(x => x.SubmittedTime).IsRequired();
+                complaint.Property(x => x.Location).IsRequired();
+                complaint.Property(x => x.ComplaintDetails).IsRequired();
+                complaint.Property(x => x.InternalComplaints).IsRequired();
+
+                // references
+                complaint.Property(x => x.SubmittedDateKey).IsRequired();
+                complaint.Property(x => x.VehicleKey);
+                complaint.Property(x => x.CompanyKey).IsRequired();
+                complaint.Property(x => x.VehicleTypeKey).IsRequired();
+                complaint.Property(x => x.ComplaintTypeKey).IsRequired();
+
+                complaint.HasIndex(x => x.Location);
+
+                complaint.HasOne(x => x.SubmittedDate).WithMany(x => x.Complaints).HasForeignKey(x => x.SubmittedDateKey);
+                complaint.HasOne(x => x.Vehicle).WithMany(x => x.Complaints).HasForeignKey(x => x.VehicleKey);
+                complaint.HasOne(x => x.Company).WithMany(x => x.Complaints).HasForeignKey(x => x.CompanyKey);
+                complaint.HasOne(x => x.VehicleType).WithMany(x => x.Complaints).HasForeignKey(x => x.VehicleTypeKey);
+                complaint.HasOne(x => x.ComplaintType).WithMany(x => x.Complaints).HasForeignKey(x => x.ComplaintTypeKey);
             });
 
             modelBuilder.Entity<Deployment>(deployment =>
@@ -327,6 +360,21 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 new Company { Key = 2, Name = "Lime" },
                 new Company { Key = 3, Name = "Skip" },
                 new Company { Key = 4, Name = "CycleHops" }
+            );
+
+            modelBuilder.Entity<ComplaintType>().HasData(
+                new ComplaintType { Key = 1, Name = "Device found blocking pedestrian right-of-way" },
+                new ComplaintType { Key = 2, Name = "Device found blocking bike-path" },
+                new ComplaintType { Key = 3, Name = "Device found inside or blocking access to a building" },
+                new ComplaintType { Key = 4, Name = "Device found blocking MAX or Streetcar tracks" },
+                new ComplaintType { Key = 5, Name = "Device found blocking vehicle travel lane" },
+                new ComplaintType { Key = 6, Name = "Device listed as available, but physically inaccessible" },
+                new ComplaintType { Key = 7, Name = "Unpermitted company, vehicle" },
+                new ComplaintType { Key = 8, Name = "Unsafe or unsanitary vehicle, damaged or missing equipment, vehicle in disrepair" },
+                new ComplaintType { Key = 9, Name = "Fare greater than expected, extra charges, or un-identifiable charges added to fare" },
+                new ComplaintType { Key = 10, Name = "User not wearing a helmet" },
+                new ComplaintType { Key = 11, Name = "User observed riding on sidewalk" },
+                new ComplaintType { Key = 12, Name = "Other" }
             );
 
             modelBuilder.Entity<PaymentType>().HasData(

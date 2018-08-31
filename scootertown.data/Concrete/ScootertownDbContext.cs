@@ -14,7 +14,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         readonly VehicleStoreOptions StoreOptions;
         // Dimensions
         public DbSet<Calendar> Calendar { get; set; }
-        public DbSet<VehicleType> Companies { get; set; }
+        public DbSet<ComplaintType> ComplaintTypes { get; set; }
         public DbSet<Neighborhood> Neighborhoods { get; set; }
         public DbSet<PatternArea> PatternAreas { get; set; }
         public DbSet<Status> Statuses { get; set; }
@@ -22,6 +22,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public DbSet<VehicleType> VehicleTypes { get; set; }
         // Facts
         public DbSet<Collision> Collisions { get; set; }
+        public DbSet<Complaint> Complaints { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Deployment> Deployments { get; set; }
 
