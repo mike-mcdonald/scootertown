@@ -7,13 +7,13 @@ console.log(`Raw trips: ${trips.length}`);
 trips = trips.reduce((accu, curr) => {
   const date = moment.unix(curr.start_time).local();
   const firstDay = moment('2018-07-25');
-  const lastDay = moment('2018-08-22');
+  const lastDay = moment().subtract(1, 'day');
   const miles = curr.trip_distance * 0.000621371;
   if (curr.trip_duration >= 60 &&
     date.isSameOrAfter(firstDay.startOf("day")) &&
     date.isSameOrBefore(lastDay.endOf("day")) &&
     miles > 0 &&
-    miles < 20
+    miles < 40
   ) {
     const key = `${curr.device_id}-${curr.start_time}`;
     accu[key] = curr;
@@ -51,7 +51,7 @@ let max = keys.reduce((accu, curr) => {
   }
   return accu;
 }, 0);
-console.log(`Max distance travelled: ${max} miles`);
+console.log(`Max distance traveled: ${max} miles`);
 
 max = keys.reduce((accu, curr) => {
   curr = trips[curr];
@@ -60,7 +60,26 @@ max = keys.reduce((accu, curr) => {
   }
   return accu;
 }, 0);
-console.log(`Max time travelled: ${max / 60} minutes`);
+console.log(`Max time traveled: ${max / 60} minutes`);
+
+let miles = keys.reduce((accu, curr) => {
+  curr = trips[curr];
+  const miles = curr.trip_distance * 0.00062137;
+  accu += miles;
+  return accu;
+}, 0);
+
+console.log(`Total miles traveled: ${miles}`);
+console.log(`Average miles traveled: ${miles / keys.length}`);
+
+let time = keys.reduce((accu, curr) => {
+  curr = trips[curr];
+  accu += curr.trip_duration;
+  return accu;
+}, 0);
+
+console.log(`Total time traveled: ${time / 60} minutes`);
+console.log(`Average time traveled: ${(time / 60) / keys.length} minutes`);
 
 let milebands = keys.reduce((accu, curr) => {
   curr = trips[curr];
@@ -82,14 +101,14 @@ let milebands = keys.reduce((accu, curr) => {
   }
   return accu;
 }, {
-  '.25': 0,
-  '.5': 0,
-  '1': 0,
-  '2': 0,
-  '3': 0,
-  '10': 0,
-  'more': 0,
-});
+    '.25': 0,
+    '.5': 0,
+    '1': 0,
+    '2': 0,
+    '3': 0,
+    '10': 0,
+    'more': 0,
+  });
 
 let companybreakdown = keys.reduce((accu, curr) => {
   curr = trips[curr];
