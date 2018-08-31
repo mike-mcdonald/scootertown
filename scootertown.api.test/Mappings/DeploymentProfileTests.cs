@@ -7,9 +7,9 @@ using Xunit;
 
 namespace PDX.PBOT.Scootertown.API.Test.Mappings
 {
-    public class Deployments
+    public class DeploymentProfileTests
     {
-        public Deployments()
+        public DeploymentProfileTests()
         {
             Mapper.Initialize(cfg =>
             {
@@ -22,11 +22,12 @@ namespace PDX.PBOT.Scootertown.API.Test.Mappings
         {
             //Given
             var now = DateTime.Now;
+            var point = new GeoJSON.Net.Geometry.Point(new GeoJSON.Net.Geometry.Position(-45.12638971, 122.54672893563));
             var deployment = new DeploymentDTO
             {
                 StartTime = now,
                 EndTime = now,
-                Location = new GeoJSON.Net.Geometry.Point(new GeoJSON.Net.Geometry.Position(-45.12638971, 122.54672893563))
+                Location = point
             };
             //When
             var dbDeployment = Mapper.Map<Deployment>(deployment);
