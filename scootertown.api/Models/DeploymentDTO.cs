@@ -12,6 +12,8 @@ namespace PDX.PBOT.Scootertown.API.Models
         public string Vehicle { get; set; }
         public sbyte BatteryLevel { get; set; }
         public Point Location { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public int? Neighborhood { get; set; }
         public int? PatternAreaKey { get; set; }
         public string PatternAreaName { get; set; }

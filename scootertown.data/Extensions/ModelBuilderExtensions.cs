@@ -261,6 +261,8 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 deployment.Property(x => x.FirstSeen);
                 deployment.Property(x => x.LastSeen);
                 deployment.Property(x => x.Location);
+                deployment.Property(x => x.X);
+                deployment.Property(x => x.Y);
                 deployment.Property(x => x.BatteryLevel);
                 deployment.Property(x => x.AllowedPlacement);
                 deployment.Property(x => x.Reserved);

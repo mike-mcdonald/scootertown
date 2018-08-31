@@ -12,6 +12,8 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public DateTime FirstSeen { get; set; }
         public DateTime LastSeen { get; set; }
         public Point Location { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public sbyte BatteryLevel { get; set; }
         public bool AllowedPlacement { get; set; }
         public bool Reserved { get; set; }
