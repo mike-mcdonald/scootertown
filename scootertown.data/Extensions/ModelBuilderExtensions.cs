@@ -140,6 +140,19 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 reason.HasMany(x => x.Deployments).WithOne(x => x.PickupReason);
             });
 
+            modelBuilder.Entity<Status>(status =>
+            {
+                status.ToTable(storeOptions.Status);
+
+                status.HasKey(x => x.Key);
+
+                status.Property(x => x.Name).HasMaxLength(50).IsRequired();
+
+                status.HasIndex(x => x.Name).IsUnique();
+
+                status.HasMany(x => x.Collisions).WithOne(x => x.ClaimStatus).HasForeignKey(x => x.ClaimStatusKey);
+            });
+
             modelBuilder.Entity<Vehicle>(vehicle =>
             {
                 vehicle.ToTable(storeOptions.Vehicle);
@@ -171,6 +184,30 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 collision.ToTable(storeOptions.Collision);
 
                 collision.HasKey(x => x.Key);
+
+                collision.Property(x => x.Time).IsRequired();
+                collision.Property(x => x.OtherUser).IsRequired();
+                collision.Property(x => x.Helmet).IsRequired();
+                collision.Property(x => x.Location).IsRequired();
+                collision.Property(x => x.Citation).IsRequired();
+                collision.Property(x => x.CitationDetails).IsRequired();
+                collision.Property(x => x.Injury).IsRequired();
+                collision.Property(x => x.StateReport).IsRequired();
+                collision.Property(x => x.InternalReports);
+
+                // reference properties
+                collision.Property(x => x.DateKey).IsRequired();
+                collision.Property(x => x.TripKey).IsRequired();
+                collision.Property(x => x.OtherVehicleKey).IsRequired();
+                collision.Property(x => x.ClaimStatusKey).IsRequired();
+
+                collision.HasIndex(x => new { x.DateKey, x.Time, x.CitationDetails }).IsUnique();
+                collision.HasIndex(x => x.Location);
+
+                collision.HasOne(x => x.Date).WithMany(x => x.Collisions).HasForeignKey(x => x.DateKey);
+                collision.HasOne(x => x.Trip).WithMany(x => x.Collisions).HasForeignKey(x => x.TripKey);
+                collision.HasOne(x => x.OtherVehicle).WithMany(x => x.Collisions).HasForeignKey(x => x.OtherVehicleKey);
+                collision.HasOne(x => x.ClaimStatus).WithMany(x => x.Collisions).HasForeignKey(x => x.ClaimStatusKey);
             });
 
             modelBuilder.Entity<Complaint>(complaint =>
@@ -307,6 +344,11 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 new RemovalReason { Key = 2, Name = "Rebalancing" },
                 new RemovalReason { Key = 3, Name = "Out of service area" },
                 new RemovalReason { Key = 4, Name = "Maintenance" }
+            );
+
+            modelBuilder.Entity<Status>().HasData(
+                new Status { Key = 1, Name = "Open" },
+                new Status { Key = 2, Name = "Closed" }
             );
 
             modelBuilder.Entity<VehicleType>().HasData(

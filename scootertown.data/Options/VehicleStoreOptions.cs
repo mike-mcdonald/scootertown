@@ -11,6 +11,7 @@ namespace PDX.PBOT.Scootertown.Data.Options
         public TableConfiguration PaymentType { get; set; } = new TableConfiguration("paymenttype", "dim");
         public TableConfiguration PlacementReason { get; set; } = new TableConfiguration("placementreason", "dim");
         public TableConfiguration RemovalReason { get; set; } = new TableConfiguration("removalreason", "dim");
+        public TableConfiguration Status { get; set; } = new TableConfiguration("status", "dim");
         public TableConfiguration Vehicle { get; set; } = new TableConfiguration("vehicle", "dim");
         public TableConfiguration VehicleType { get; set; } = new TableConfiguration("vehicletype", "dim");
 
