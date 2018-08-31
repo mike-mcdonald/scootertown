@@ -80,8 +80,6 @@ namespace PDX.PBOT.App.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody]DeploymentDTO value)
         {
-            var now = DateTime.Now;
-
             var deployment = await FillDeployment(value);
 
             await DeploymentRepository.Add(deployment, false);
