@@ -17,6 +17,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 {
     public class TripService : ITripService
     {
+        private readonly ILogger Logger;
         private readonly INeighborhoodRepository NeighborhoodRepository;
         private readonly IPatternAreaRepository PatternAreaRepository;
         private readonly HttpClient HttpClient;
@@ -28,6 +29,8 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             IPatternAreaRepository patternAreaRepository
         )
         {
+            Logger = logger;
+
             NeighborhoodRepository = neighborhoodRepository;
             PatternAreaRepository = patternAreaRepository;
 
@@ -60,7 +63,15 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                 trip.PatternAreaEndKey = (await patternAreaEndTask)?.Key;
 
                 // add it to the database
-                await HttpClient.PostAsJsonAsync("trip", trip);
+                try
+                {
+                    var response = await HttpClient.PostAsJsonAsync("trip", trip);
+                    response.EnsureSuccessStatusCode();
+                }
+                catch
+                {
+                    Logger.LogWarning("Error saving trip record for {company}", company);
+                }
             }
         }
     }
