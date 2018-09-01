@@ -25,10 +25,6 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 
         public override async Task<Trip> Add(Trip item, bool saveImmediately = true)
         {
-            var now = DateTime.Now;
-
-            item.LastSeen = now;
-
             // make sure we won't violate the indices
             var existingItem = await Context.Set<Trip>().FirstOrDefaultAsync(
                 x => (x.AlternateKey == item.AlternateKey)
@@ -39,7 +35,6 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 
             if (existingItem == null)
             {
-                item.FirstSeen = now;
                 await Context.Set<Trip>().AddAsync(item);
                 var changes = saveImmediately ? await Context.SaveChangesAsync() : 0;
                 return item;

@@ -75,6 +75,8 @@ namespace PDX.PBOT.App.API.Controllers
 
             var trip = Mapper.Map<Trip>(value);
 
+            trip.FirstSeen = trip.LastSeen = now;
+
             var vehicle = await VehicleRepository.Find(value.Vehicle) ?? await VehicleRepository.Add(new Vehicle { Name = value.Vehicle });
             var endDateTask = CalendarRepository.Find(value.EndTime);
 
@@ -103,6 +105,7 @@ namespace PDX.PBOT.App.API.Controllers
             if (existing != null)
             {
                 trip.Key = existing.Key;
+                trip.FirstSeen = existing.FirstSeen == DateTime.MinValue ? now : existing.FirstSeen;
             }
 
             var upsertTask = existing == null ? TripRepository.Add(trip, false) : TripRepository.Update(trip, false);
