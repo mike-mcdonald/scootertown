@@ -68,9 +68,9 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                     var response = await HttpClient.PostAsJsonAsync("trip", trip);
                     response.EnsureSuccessStatusCode();
                 }
-                catch
+                catch (HttpRequestException e)
                 {
-                    Logger.LogWarning("Error saving trip record for {company}", company);
+                    Logger.LogWarning("Error saving trip record for {company}:\n{message}", company, e.Message);
                 }
             }
         }

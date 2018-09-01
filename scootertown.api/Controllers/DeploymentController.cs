@@ -80,20 +80,21 @@ namespace PDX.PBOT.App.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody]DeploymentDTO value)
         {
-            var deployment = await FillDeployment(value);
-
-            await DeploymentRepository.Add(deployment, false);
-
             try
             {
+                var deployment = await FillDeployment(value);
+
+                await DeploymentRepository.Add(deployment, false);
+
                 await DeploymentRepository.SaveChanges();
+
+                return Ok(Mapper.Map<DeploymentDTO>(deployment));
             }
             catch (Exception e)
             {
                 Logger.LogError("Error adding deployment:\n{message}", e.Message);
                 return BadRequest(e.ToString());
             }
-            return Ok(Mapper.Map<DeploymentDTO>(deployment));
         }
 
         // PUT api/deployment/5
