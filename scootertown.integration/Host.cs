@@ -16,8 +16,9 @@ namespace PDX.PBOT.Scootertown.Integration
 {
     public class Host : IHostedService, IDisposable
     {
-        private Timer deploymentTimer;
-        private Timer tripTimer;
+        private Timer DeploymentTimer;
+        private Timer TripTimer;
+        private Timer CollisionTimer;
         private readonly ILogger Logger;
         private readonly Container Container;
         private readonly List<ICompanyManager> Managers = new List<ICompanyManager>();
@@ -74,7 +75,7 @@ namespace PDX.PBOT.Scootertown.Integration
                 Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
             }
 
-            deploymentTimer = new Timer(obj =>
+            DeploymentTimer = new Timer(obj =>
             {
                 foreach (var manager in Managers)
                 {
@@ -114,7 +115,7 @@ namespace PDX.PBOT.Scootertown.Integration
                 }
             }, new AutoResetEvent(false), 1000, 1000 * 20);
 
-            tripTimer = new Timer(obj =>
+            TripTimer = new Timer(obj =>
             {
                 try
                 {
@@ -169,22 +170,53 @@ namespace PDX.PBOT.Scootertown.Integration
                 }
 
             }, new AutoResetEvent(false), 1000 * 10, 1000 * 60);
+
+            CollisionTimer = new Timer(obj =>
+            {
+                foreach (var manager in Managers)
+                {
+                    var collisionTask = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            Logger.LogDebug("Retrieving Collisions for {Company}.", manager.Company);
+
+                            var collisions = await manager.RetrieveCollisions();
+
+                            using (AsyncScopedLifestyle.BeginScope(Container))
+                            {
+                                var collisionService = Container.GetInstance<ICollisionService>();
+
+                                Logger.LogDebug("Writing {count} Collision records for {Company}.", collisions.Count, manager.Company);
+
+                                await collisionService.Save(manager.Company, collisions);
+                            }
+
+                            Logger.LogDebug("Done writing Collisions records for {Company}.", manager.Company);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                        }
+                    });
+                }
+            }, new AutoResetEvent(false), 1000 * 60, 1000 * 60 * 60);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.LogInformation("Stopping.");
 
-            deploymentTimer?.Change(Timeout.Infinite, 0);
-            tripTimer?.Change(Timeout.Infinite, 0);
+            DeploymentTimer?.Change(Timeout.Infinite, 0);
+            TripTimer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            deploymentTimer?.Dispose();
-            tripTimer?.Dispose();
+            DeploymentTimer?.Dispose();
+            TripTimer?.Dispose();
         }
     }
 }

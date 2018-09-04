@@ -85,6 +85,7 @@ namespace PDX.PBOT.Scootertown.Integration
                     {
                         cfg.AddProfile<DeploymentProfile>();
                         cfg.AddProfile<TripProfile>();
+                        cfg.AddProfile<CollisionProfile>();
                         cfg.AddProfile<NeighborhoodProfile>();
                         cfg.AddProfile<PatternAreaProfile>();
                         cfg.AddProfile<GeoJsonProfile>();
@@ -142,6 +143,7 @@ namespace PDX.PBOT.Scootertown.Integration
 
                     container.Register<ITripService, TripService>(Lifestyle.Scoped);
                     container.Register<IDeploymentService, DeploymentService>(Lifestyle.Scoped);
+                    container.Register<ICollisionService, CollisionService>(Lifestyle.Scoped);
                     container.Register<INeighborhoodService, NeighborhoodService>(Lifestyle.Scoped);
                     container.Register<IPatternAreaService, PatternAreaService>(Lifestyle.Scoped);
 
