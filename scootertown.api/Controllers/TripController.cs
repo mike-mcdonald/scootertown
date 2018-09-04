@@ -11,7 +11,7 @@ using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
 
-namespace PDX.PBOT.App.API.Controllers
+namespace PDX.PBOT.Scootertown.API.Controllers
 {
     [Route("api/[controller]")]
     public class TripController : Controller
