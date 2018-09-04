@@ -30,17 +30,14 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
-            var builder = new UriBuilder("collisions.json");
-            string url = builder.ToString();
-
-            var response = await Client.GetAsync(url);
+            var response = await Client.GetAsync("collisions.json");
             if (response.IsSuccessStatusCode)
             {
                 var collisions = await response.DeserializeJson(new Queue<CollisionDTO>());
                 return collisions;
             }
 
-            throw new Exception($"Error retrieving availability for {CompanyName}");
+            throw new Exception($"Error retrieving collisions for {CompanyName}");
         }
 
         public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()

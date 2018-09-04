@@ -10,9 +10,13 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         private static readonly char delimiter = '|';
 
         public TimeSpan Time { get; set; }
+        public DateTime FirstSeen { get; set; }
+        public DateTime LastSeen { get; set; }
         public bool OtherUser { get; set; }
         public bool Helmet { get; set; }
         public Point Location { get; set; }
+        public double? X { get; set; }
+        public double? Y { get; set; }
         public bool Citation { get; set; }
         public string CitationDetails { get; set; }
         public bool Injury { get; set; }
@@ -31,11 +35,21 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         // reference properties
         public int DateKey { get; set; }
         public Calendar Date { get; set; }
-        public long TripKey { get; set; }
+        public int CompanyKey { get; set; }
+        public Company Company { get; set; }
+        public int? VehicleKey { get; set; }
+        public Vehicle Vehicle { get; set; }
+        public int? VehicleTypeKey { get; set; }
+        public VehicleType VehicleType { get; set; }
+        public long? TripKey { get; set; }
         public Trip Trip { get; set; }
-        public int OtherVehicleKey { get; set; }
-        public VehicleType OtherVehicle { get; set; }
-        public int ClaimStatusKey { get; set; }
+        public int? OtherVehicleTypeKey { get; set; }
+        public VehicleType OtherVehicleType { get; set; }
+        public int? ClaimStatusKey { get; set; }
         public Status ClaimStatus { get; set; }
+        public int? NeighborhoodKey { get; set; }
+        public Neighborhood Neighborhood { get; set; }
+        public int? PatternAreaKey { get; set; }
+        public PatternArea PatternArea { get; set; }
     }
 }

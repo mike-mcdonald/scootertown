@@ -15,6 +15,14 @@ namespace PDX.PBOT.Scootertown.Data.Tests.Common
             });
         }
 
+        public byte Length
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
         public VehicleType this[int index]    // Indexer declaration  
         {
             get

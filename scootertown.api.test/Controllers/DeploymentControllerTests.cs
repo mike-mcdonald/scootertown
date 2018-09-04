@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using PDX.PBOT.App.API.Controllers;
+using PDX.PBOT.Scootertown.API.Controllers;
 using PDX.PBOT.Scootertown.API.Models;
 using PDX.PBOT.Scootertown.API.Test.Common;
 using PDX.PBOT.Scootertown.Data.Concrete;

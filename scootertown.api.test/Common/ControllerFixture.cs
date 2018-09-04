@@ -19,6 +19,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
         public readonly ScootertownDbContext Context;
         public readonly DeploymentRepository DeploymentRepository;
         public readonly TripRepository TripRepository;
+        public readonly CollisionRepository CollisionRepository;
         public readonly CalendarRepository CalendarRepository;
         public readonly CompanyRepository CompanyRepository;
         public readonly NeighborhoodRepository NeighborhoodRepository;
@@ -26,6 +27,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
         public readonly PaymentTypeRepository PaymentTypeRepository;
         public readonly PlacementReasonRepository PlacementReasonRepository;
         public readonly RemovalReasonRepository RemovalReasonRepository;
+        public readonly StatusRepository StatusRepository;
         public readonly VehicleRepository VehicleRepository;
         public readonly VehicleTypeRepository VehicleTypeRepository;
 
@@ -35,6 +37,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
             {
                 cfg.AddProfile<DeploymentProfile>();
                 cfg.AddProfile<TripProfile>();
+                cfg.AddProfile<CollisionProfile>();
             });
 
 
@@ -47,6 +50,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
 
             DeploymentRepository = new DeploymentRepository(context);
             TripRepository = new TripRepository(context);
+            CollisionRepository = new CollisionRepository(context);
             CalendarRepository = new CalendarRepository(context);
             CompanyRepository = new CompanyRepository(context);
             NeighborhoodRepository = new NeighborhoodRepository(context);
@@ -54,6 +58,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
             PaymentTypeRepository = new PaymentTypeRepository(context);
             PlacementReasonRepository = new PlacementReasonRepository(context);
             RemovalReasonRepository = new RemovalReasonRepository(context);
+            StatusRepository = new StatusRepository(context);
             VehicleRepository = new VehicleRepository(context);
             VehicleTypeRepository = new VehicleTypeRepository(context);
 

@@ -199,27 +199,31 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 collision.HasKey(x => x.Key);
 
                 collision.Property(x => x.Time).IsRequired();
-                collision.Property(x => x.OtherUser).IsRequired();
-                collision.Property(x => x.Helmet).IsRequired();
-                collision.Property(x => x.Location).IsRequired();
-                collision.Property(x => x.Citation).IsRequired();
-                collision.Property(x => x.CitationDetails).IsRequired();
-                collision.Property(x => x.Injury).IsRequired();
-                collision.Property(x => x.StateReport).IsRequired();
+                collision.Property(x => x.FirstSeen);
+                collision.Property(x => x.LastSeen);
+                collision.Property(x => x.OtherUser);
+                collision.Property(x => x.Helmet);
+                collision.Property(x => x.Location);
+                collision.Property(x => x.X);
+                collision.Property(x => x.Y);
+                collision.Property(x => x.Citation);
+                collision.Property(x => x.CitationDetails);
+                collision.Property(x => x.Injury);
+                collision.Property(x => x.StateReport);
                 collision.Property(x => x.InternalReports);
 
                 // reference properties
                 collision.Property(x => x.DateKey).IsRequired();
-                collision.Property(x => x.TripKey).IsRequired();
-                collision.Property(x => x.OtherVehicleKey).IsRequired();
-                collision.Property(x => x.ClaimStatusKey).IsRequired();
+                collision.Property(x => x.TripKey);
+                collision.Property(x => x.OtherVehicleTypeKey);
+                collision.Property(x => x.ClaimStatusKey);
 
-                collision.HasIndex(x => new { x.DateKey, x.Time, x.CitationDetails }).IsUnique();
+                collision.HasIndex(x => new { x.DateKey, x.Time }).IsUnique();
                 collision.HasIndex(x => x.Location);
 
                 collision.HasOne(x => x.Date).WithMany(x => x.Collisions).HasForeignKey(x => x.DateKey);
                 collision.HasOne(x => x.Trip).WithMany(x => x.Collisions).HasForeignKey(x => x.TripKey);
-                collision.HasOne(x => x.OtherVehicle).WithMany(x => x.Collisions).HasForeignKey(x => x.OtherVehicleKey);
+                collision.HasOne(x => x.OtherVehicleType).WithMany(x => x.Collisions).HasForeignKey(x => x.OtherVehicleTypeKey);
                 collision.HasOne(x => x.ClaimStatus).WithMany(x => x.Collisions).HasForeignKey(x => x.ClaimStatusKey);
             });
 
@@ -230,16 +234,16 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 complaint.HasKey(x => x.Key);
 
                 complaint.Property(x => x.SubmittedTime).IsRequired();
-                complaint.Property(x => x.Location).IsRequired();
-                complaint.Property(x => x.ComplaintDetails).IsRequired();
-                complaint.Property(x => x.InternalComplaints).IsRequired();
+                complaint.Property(x => x.Location);
+                complaint.Property(x => x.ComplaintDetails);
+                complaint.Property(x => x.InternalComplaints);
 
                 // references
                 complaint.Property(x => x.SubmittedDateKey).IsRequired();
                 complaint.Property(x => x.VehicleKey);
                 complaint.Property(x => x.CompanyKey).IsRequired();
-                complaint.Property(x => x.VehicleTypeKey).IsRequired();
-                complaint.Property(x => x.ComplaintTypeKey).IsRequired();
+                complaint.Property(x => x.VehicleTypeKey);
+                complaint.Property(x => x.ComplaintTypeKey);
 
                 complaint.HasIndex(x => x.Location);
                 complaint.HasIndex(x => new { x.SubmittedDateKey, x.SubmittedTime, x.ComplaintDetails });
