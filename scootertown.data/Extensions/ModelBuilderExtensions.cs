@@ -210,7 +210,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 collision.Property(x => x.CitationDetails);
                 collision.Property(x => x.Injury);
                 collision.Property(x => x.StateReport);
-                collision.Property(x => x.InternalReports);
+                collision.Property(x => x.InternalReports).HasColumnName("reports");
 
                 // reference properties
                 collision.Property(x => x.DateKey).IsRequired();
@@ -234,9 +234,13 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 complaint.HasKey(x => x.Key);
 
                 complaint.Property(x => x.SubmittedTime).IsRequired();
+                complaint.Property(x => x.FirstSeen);
+                complaint.Property(x => x.LastSeen);
                 complaint.Property(x => x.Location);
+                complaint.Property(x => x.X);
+                complaint.Property(x => x.Y);
                 complaint.Property(x => x.ComplaintDetails);
-                complaint.Property(x => x.InternalComplaints);
+                complaint.Property(x => x.InternalComplaints).HasColumnName("complaints");
 
                 // references
                 complaint.Property(x => x.SubmittedDateKey).IsRequired();

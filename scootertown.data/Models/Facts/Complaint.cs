@@ -10,7 +10,11 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         private static readonly char delimiter = '|';
 
         public TimeSpan SubmittedTime { get; set; }
+        public DateTime FirstSeen { get; set; }
+        public DateTime LastSeen { get; set; }
         public Point Location { get; set; }
+        public double? X { get; set; }
+        public double? Y { get; set; }
         public string ComplaintDetails { get; set; }
         public string InternalComplaints { get; set; }
         [NotMapped]
@@ -26,13 +30,13 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         // references
         public int SubmittedDateKey { get; set; }
         public Calendar SubmittedDate { get; set; }
-        public int VehicleKey { get; set; }
+        public int? VehicleKey { get; set; }
         public Vehicle Vehicle { get; set; }
         public int CompanyKey { get; set; }
         public Company Company { get; set; }
-        public int VehicleTypeKey { get; set; }
+        public int? VehicleTypeKey { get; set; }
         public VehicleType VehicleType { get; set; }
-        public int ComplaintTypeKey { get; set; }
+        public int? ComplaintTypeKey { get; set; }
         public ComplaintType ComplaintType { get; set; }
     }
 }
