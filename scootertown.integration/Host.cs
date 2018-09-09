@@ -19,6 +19,7 @@ namespace PDX.PBOT.Scootertown.Integration
         private Timer DeploymentTimer;
         private Timer TripTimer;
         private Timer CollisionTimer;
+        private Timer ComplaintTimer;
         private readonly ILogger Logger;
         private readonly Container Container;
         private readonly List<ICompanyManager> Managers = new List<ICompanyManager>();
@@ -201,6 +202,37 @@ namespace PDX.PBOT.Scootertown.Integration
                     });
                 }
             }, new AutoResetEvent(false), 1000 * 60, 1000 * 60 * 60);
+
+            ComplaintTimer = new Timer(obj =>
+            {
+                foreach (var manager in Managers)
+                {
+                    var collisionTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        Logger.LogDebug("Retrieving complaints for {Company}.", manager.Company);
+
+                        var complaints = await manager.RetrieveComplaints();
+
+                        using (AsyncScopedLifestyle.BeginScope(Container))
+                        {
+                            var complaintservice = Container.GetInstance<IComplaintService>();
+
+                            Logger.LogDebug("Writing {count} complaint records for {Company}.", complaints.Count, manager.Company);
+
+                            await complaintservice.Save(manager.Company, complaints);
+                        }
+
+                        Logger.LogDebug("Done writing complaints records for {Company}.", manager.Company);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                    }
+                });
+                }
+            }, new AutoResetEvent(false), 0, 1000 * 60 * 60);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
