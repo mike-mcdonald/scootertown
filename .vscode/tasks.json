@@ -35,7 +35,7 @@
         },
         {
             "label": "migration remove",
-            "command": "dotnet ef migrations  --startup-project scootertown.integration --project scootertown.data remove",
+            "command": "dotnet ef migrations --startup-project scootertown.integration --project scootertown.data remove",
             "type": "shell",
             "group": "build",
             "presentation": {
