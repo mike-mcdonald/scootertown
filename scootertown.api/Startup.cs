@@ -38,6 +38,8 @@ namespace scootertown.api
             {
                 cfg.AddProfile<DeploymentProfile>();
                 cfg.AddProfile<TripProfile>();
+                cfg.AddProfile<CollisionProfile>();
+                cfg.AddProfile<ComplaintProfile>();
             });
 
             // database table options
@@ -64,15 +66,13 @@ namespace scootertown.api
 
             // larger dimension repositories don't to save memory
             services.AddTransient<ICalendarRepository, CalendarRepository>();
-            services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
             services.AddTransient<IVehicleRepository, VehicleRepository>();
-
-            // add generic services for repositories for any geojson we'll read in
-            services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
 
             // fact repositories 
             services.AddTransient<ITripRepository, TripRepository>();
             services.AddTransient<IDeploymentRepository, DeploymentRepository>();
+            services.AddTransient<ICollisionRepository, CollisionRepository>();
+            services.AddTransient<IComplaintRepository, ComplaintRepository>();
 
             services.AddSingleton<ILoggerFactory, LoggerFactory>();
         }
