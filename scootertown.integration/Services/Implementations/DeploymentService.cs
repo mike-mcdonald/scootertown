@@ -63,7 +63,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
                     // for this vehicle, is there an active deployment?
                     var currentDeployment = activeDeployments.FirstOrDefault(
-                        x => x.Vehicle == deployment.Vehicle &&
+                        x => x.VehicleName == deployment.VehicleName &&
                         x.StartTime == deployment.StartTime
                     );
                     if (currentDeployment != null)
@@ -86,7 +86,7 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                         var neighborhoodTask = NeighborhoodRepository.Find(Mapper.Map<Point>(deployment.Location));
                         var patternAreaTask = PatternAreaRepository.Find(Mapper.Map<Point>(deployment.Location));
 
-                        deployment.Neighborhood = (await neighborhoodTask)?.Key;
+                        deployment.NeighborhoodKey = (await neighborhoodTask)?.Key;
                         deployment.PatternAreaKey = (await patternAreaTask)?.Key;
 
                         deployment.FirstSeen = deployment.LastSeen = now;

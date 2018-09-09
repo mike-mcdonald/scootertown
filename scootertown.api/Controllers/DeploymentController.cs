@@ -19,33 +19,21 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         private readonly IDeploymentRepository DeploymentRepository;
         private readonly ICalendarRepository CalendarRepository;
         private readonly ICompanyRepository CompanyRepository;
-        private readonly INeighborhoodRepository NeighborhoodRepository;
-        private readonly IPlacementReasonRepository PlacementReasonRepository;
-        private readonly IRemovalReasonRepository RemovalReasonRepository;
         private readonly IVehicleRepository VehicleRepository;
-        private readonly IVehicleTypeRepository VehicleTypeRepository;
 
         public DeploymentController(
             ILogger<DeploymentController> logger,
             IDeploymentRepository deploymentRepository,
             ICalendarRepository calendarRepository,
             ICompanyRepository companyRepository,
-            INeighborhoodRepository neighborhoodRepository,
-            IPlacementReasonRepository placementReasonRepository,
-            IRemovalReasonRepository removalReasonRepository,
-            IVehicleRepository vehicleRepository,
-            IVehicleTypeRepository vehicleTypeRepository
+            IVehicleRepository vehicleRepository
         )
         {
             Logger = logger;
             DeploymentRepository = deploymentRepository;
             CalendarRepository = calendarRepository;
             CompanyRepository = companyRepository;
-            NeighborhoodRepository = neighborhoodRepository;
-            PlacementReasonRepository = placementReasonRepository;
-            RemovalReasonRepository = removalReasonRepository;
             VehicleRepository = vehicleRepository;
-            VehicleTypeRepository = vehicleTypeRepository;
         }
 
         // GET api/deployment
@@ -106,6 +94,7 @@ namespace PDX.PBOT.Scootertown.API.Controllers
                 var deployment = await FillDeployment(value);
 
                 await DeploymentRepository.Update(deployment);
+
                 return Ok(Mapper.Map<DeploymentDTO>(deployment));
             }
             catch (Exception e)
@@ -119,7 +108,7 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         [HttpPost("{key}/end")]
         public async Task<IActionResult> EndDeployment(long key)
         {
-            Logger.LogInformation($"Ending deployment {key}...");
+            Logger.LogDebug($"Ending deployment {key}...");
             try
             {
                 var deployment = await DeploymentRepository.Find(key);
@@ -144,20 +133,20 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         {
             var deployment = Mapper.Map<Deployment>(value);
 
-            var vehicle = await VehicleRepository.Find(value.Vehicle) ?? await VehicleRepository.Add(new Vehicle { Name = value.Vehicle });
             var endDateTask = value.EndTime.HasValue ? CalendarRepository.Find(value.EndTime.Value) : Task.FromResult<Calendar>(null);
 
-            // need the vehicle so we can test for active deployments
-            deployment.VehicleKey = vehicle.Key;
-
             // Get the reference properties set up
-            // write this first so we don't start two operations
-            deployment.EndDateKey = (await endDateTask)?.Key;
-
-            var companyTask = CompanyRepository.Find(value.Company);
-            var startDateTask = CalendarRepository.Find(value.StartTime);
+            var companyTask = CompanyRepository.Find(value.CompanyName);
+            var vehicleTask = VehicleRepository.Find(value.VehicleName);
 
             deployment.CompanyKey = (await companyTask).Key;
+            // write this first so we don't start two operations
+            deployment.EndDateKey = (await endDateTask)?.Key;
+            var startDateTask = CalendarRepository.Find(value.StartTime);
+
+            var vehicle = await vehicleTask ?? await VehicleRepository.Add(new Vehicle { Name = value.VehicleName });
+            deployment.VehicleKey = vehicle.Key;
+
             deployment.StartDateKey = (await startDateTask).Key;
 
             return deployment;
