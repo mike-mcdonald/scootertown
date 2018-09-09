@@ -67,11 +67,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 DeploymentRepository,
                 CalendarRepository,
                 CompanyRepository,
-                NeighborhoodRepository,
-                PlacementReasonRepository,
-                RemovalReasonRepository,
-                VehicleRepository,
-                VehicleTypeRepository
+                VehicleRepository
             );
 
             var deploymentDTO = new DeploymentDTO
@@ -79,7 +75,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 Key = 1,
                 StartTime = now,
                 EndTime = now.AddHours(2),
-                Company = companyName
+                CompanyName = companyName
             };
             //When
             var result = await controller.Update(deploymentDTO.Key, deploymentDTO);

@@ -59,7 +59,6 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 TripRepository,
                 CalendarRepository,
                 CompanyRepository,
-                NeighborhoodRepository,
                 PaymentTypeRepository,
                 VehicleRepository,
                 VehicleTypeRepository
@@ -132,7 +131,6 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 TripRepository,
                 CalendarRepository,
                 CompanyRepository,
-                NeighborhoodRepository,
                 PaymentTypeRepository,
                 VehicleRepository,
                 VehicleTypeRepository

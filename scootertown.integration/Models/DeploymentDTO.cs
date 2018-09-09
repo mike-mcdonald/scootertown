@@ -6,21 +6,21 @@ namespace PDX.PBOT.Scootertown.Integration.Models
     public class DeploymentDTO
     {
         [JsonProperty(PropertyName = "company_name")]
-        public string Company { get; set; }
+        public string CompanyName { get; set; }
         [JsonProperty(PropertyName = "device_type")]
-        public byte VehicleType { get; set; }
+        public byte VehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "device_id")]
-        public string Vehicle { get; set; }
+        public string VehicleName { get; set; }
         [JsonProperty(PropertyName = "battery_level")]
         public sbyte BatteryLevel { get; set; }
         [JsonProperty(PropertyName = "location")]
         public Point Location { get; set; }
         [JsonProperty(PropertyName = "placement_reason")]
-        public byte PlacementReason { get; set; }
+        public byte PlacementReasonKey { get; set; }
         [JsonProperty(PropertyName = "allowed_placement")]
         public bool AllowedPlacement { get; set; }
         [JsonProperty(PropertyName = "pickup_reason")]
-        public byte PickupReason { get; set; }
+        public byte PickupReasonKey { get; set; }
         [JsonProperty(PropertyName = "is_reserved")]
         public bool Reserved { get; set; }
         [JsonProperty(PropertyName = "is_disabled")]
