@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 
 namespace PDX.PBOT.Scootertown.Data.Repositories
@@ -9,7 +10,11 @@ namespace PDX.PBOT.Scootertown.Data.Repositories
     public abstract class DimensionRepositoryBase<T> : RepositoryBase<T>
         where T : DimensionBase
     {
-        public DimensionRepositoryBase(DbContext context) : base(context) { }
+        protected readonly IDistributedCache Cache;
+        public DimensionRepositoryBase(DbContext context, IDistributedCache cache) : base(context)
+        {
+            Cache = cache;
+        }
 
         public override async Task<T> Find(string name)
         {
