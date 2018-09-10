@@ -20,7 +20,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         private readonly ITripRepository TripRepository;
         private readonly ICalendarRepository CalendarRepository;
         private readonly ICompanyRepository CompanyRepository;
-        private readonly IPaymentTypeRepository PaymentTypeRepository;
         private readonly IVehicleRepository VehicleRepository;
         private readonly IVehicleTypeRepository VehicleTypeRepository;
 
@@ -29,7 +28,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             ITripRepository tripRepository,
             ICalendarRepository calendarRepository,
             ICompanyRepository companyRepository,
-            IPaymentTypeRepository paymentTypeRepository,
             IVehicleRepository vehicleRepository,
             IVehicleTypeRepository vehicleTypeRepository
         )
@@ -38,7 +36,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             TripRepository = tripRepository;
             CalendarRepository = calendarRepository;
             CompanyRepository = companyRepository;
-            PaymentTypeRepository = paymentTypeRepository;
             VehicleRepository = vehicleRepository;
             VehicleTypeRepository = vehicleTypeRepository;
         }
@@ -74,28 +71,20 @@ namespace PDX.PBOT.Scootertown.API.Controllers
 
             trip.FirstSeen = trip.LastSeen = now;
 
-
-
             // Get the reference properties set up
-            var vehicleTask = VehicleRepository.Find(value.Vehicle);
+            var vehicleTask = VehicleRepository.Find(value.VehicleName);
             var endDateTask = CalendarRepository.Find(value.EndTime);
-            var companyTask = CompanyRepository.Find(value.Company);
-            var vehicleTypeTask = VehicleTypeRepository.Find(value.VehicleType);
-            var paymentTypeTask = PaymentTypeRepository.Find(value.PaymentType);
-            var paymentAccessTask = PaymentTypeRepository.Find(value.PaymentAccess);
+            var companyTask = CompanyRepository.Find(value.CompanyName);
 
             // await this first before finding the next date
             trip.EndDateKey = (await endDateTask).Key;
             var startDateTask = CalendarRepository.Find(value.StartTime);
 
             trip.CompanyKey = (await companyTask).Key;
-            trip.VehicleTypeKey = (await vehicleTypeTask).Key;
-            trip.PaymentTypeKey = (await paymentTypeTask).Key;
-            trip.PaymentAccessKey = (await paymentAccessTask).Key;
 
             trip.StartDateKey = (await startDateTask).Key;
 
-            var vehicle = await vehicleTask ?? await VehicleRepository.Add(new Vehicle { Name = value.Vehicle });
+            var vehicle = await vehicleTask ?? await VehicleRepository.Add(new Vehicle { Name = value.VehicleName });
             trip.VehicleKey = vehicle.Key;
 
             var existing = await existingTask;

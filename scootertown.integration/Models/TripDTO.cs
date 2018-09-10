@@ -9,11 +9,11 @@ namespace PDX.PBOT.Scootertown.Integration.Models
     public class TripDTO
     {
         [JsonProperty(PropertyName = "company_name")]
-        public string Company { get; set; }
+        public string CompanyName { get; set; }
         [JsonProperty(PropertyName = "device_type")]
-        public byte VehicleType { get; set; }
+        public byte VehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "device_id")]
-        public string Vehicle { get; set; }
+        public string VehicleName { get; set; }
         [JsonProperty(PropertyName = "trip_id")]
         public string AlternateKey { get; set; }
         [JsonProperty(PropertyName = "trip_duration")]
@@ -45,8 +45,8 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "average_speed")]
         public byte? AverageSpeed { get; set; }
         [JsonProperty(PropertyName = "payment_type")]
-        public byte PaymentType { get; set; }
+        public byte PaymentTypeKey { get; set; }
         [JsonProperty(PropertyName = "payment_access")]
-        public byte PaymentAccess { get; set; }
+        public byte PaymentAccessKey { get; set; }
     }
 }
