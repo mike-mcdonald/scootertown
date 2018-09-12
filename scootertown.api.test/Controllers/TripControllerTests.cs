@@ -59,24 +59,22 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 TripRepository,
                 CalendarRepository,
                 CompanyRepository,
-                PaymentTypeRepository,
-                VehicleRepository,
-                VehicleTypeRepository
+                VehicleRepository
             );
 
             var tripDTO = new TripDTO
             {
                 StartTime = now,
                 EndTime = now.AddHours(2),
-                Company = companyName,
-                Vehicle = vehicle.Name,
-                VehicleType = Convert.ToByte(vehicleType.Key),
-                NeighborhoodStart = neighborhood.Key,
-                NeighborhoodEnd = neighborhood.Key,
+                CompanyName = companyName,
+                VehicleName = vehicle.Name,
+                VehicleTypeKey = Convert.ToByte(vehicleType.Key),
+                NeighborhoodStartKey = neighborhood.Key,
+                NeighborhoodEndKey = neighborhood.Key,
                 PatternAreaStartKey = patternArea.Key,
                 PatternAreaEndKey = patternArea.Key,
-                PaymentType = Convert.ToByte(paymentType.Key),
-                PaymentAccess = Convert.ToByte(paymentType.Key)
+                PaymentTypeKey = Convert.ToByte(paymentType.Key),
+                PaymentAccessKey = Convert.ToByte(paymentType.Key)
 
             };
             //When
@@ -131,24 +129,22 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 TripRepository,
                 CalendarRepository,
                 CompanyRepository,
-                PaymentTypeRepository,
-                VehicleRepository,
-                VehicleTypeRepository
+                VehicleRepository
             );
 
             var tripDTO = new TripDTO
             {
                 StartTime = now,
                 EndTime = now.AddHours(2),
-                Company = companyName,
-                Vehicle = vehicle.Name,
-                VehicleType = Convert.ToByte(vehicleType.Key),
-                NeighborhoodStart = neighborhood.Key,
-                NeighborhoodEnd = neighborhood.Key,
+                CompanyName = companyName,
+                VehicleName = vehicle.Name,
+                VehicleTypeKey = Convert.ToByte(vehicleType.Key),
+                NeighborhoodStartKey = neighborhood.Key,
+                NeighborhoodEndKey = neighborhood.Key,
                 PatternAreaStartKey = patternArea.Key,
                 PatternAreaEndKey = patternArea.Key,
-                PaymentType = Convert.ToByte(paymentType.Key),
-                PaymentAccess = Convert.ToByte(paymentType.Key)
+                PaymentTypeKey = Convert.ToByte(paymentType.Key),
+                PaymentAccessKey = Convert.ToByte(paymentType.Key)
 
             };
             //When

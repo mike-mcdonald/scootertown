@@ -52,7 +52,6 @@ namespace PDX.PBOT.Scootertown.API.Test.Controllers
                 CompanyRepository,
                 VehicleRepository,
                 VehicleTypeRepository,
-                StatusRepository,
                 TripRepository
             );
         }

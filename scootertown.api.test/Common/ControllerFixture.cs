@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NetTopologySuite.Geometries;
@@ -47,20 +48,21 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
             options = builder.Options;
 
             var context = new ScootertownDbContext(options, new VehicleStoreOptions());
+            var cache = new Mock<IMemoryCache>();
 
             DeploymentRepository = new DeploymentRepository(context);
             TripRepository = new TripRepository(context);
             CollisionRepository = new CollisionRepository(context);
-            CalendarRepository = new CalendarRepository(context);
-            CompanyRepository = new CompanyRepository(context);
-            NeighborhoodRepository = new NeighborhoodRepository(context);
-            PatternAreaRepository = new PatternAreaRepository(context);
-            PaymentTypeRepository = new PaymentTypeRepository(context);
-            PlacementReasonRepository = new PlacementReasonRepository(context);
-            RemovalReasonRepository = new RemovalReasonRepository(context);
-            StatusRepository = new StatusRepository(context);
-            VehicleRepository = new VehicleRepository(context);
-            VehicleTypeRepository = new VehicleTypeRepository(context);
+            CalendarRepository = new CalendarRepository(context, cache.Object);
+            CompanyRepository = new CompanyRepository(context, cache.Object);
+            NeighborhoodRepository = new NeighborhoodRepository(context, cache.Object);
+            PatternAreaRepository = new PatternAreaRepository(context, cache.Object);
+            PaymentTypeRepository = new PaymentTypeRepository(context, cache.Object);
+            PlacementReasonRepository = new PlacementReasonRepository(context, cache.Object);
+            RemovalReasonRepository = new RemovalReasonRepository(context, cache.Object);
+            StatusRepository = new StatusRepository(context, cache.Object);
+            VehicleRepository = new VehicleRepository(context, cache.Object);
+            VehicleTypeRepository = new VehicleTypeRepository(context, cache.Object);
 
             Context = context;
         }
