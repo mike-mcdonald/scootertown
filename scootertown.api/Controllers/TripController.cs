@@ -21,15 +21,13 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         private readonly ICalendarRepository CalendarRepository;
         private readonly ICompanyRepository CompanyRepository;
         private readonly IVehicleRepository VehicleRepository;
-        private readonly IVehicleTypeRepository VehicleTypeRepository;
 
         public TripController(
             ILogger<TripController> logger,
             ITripRepository tripRepository,
             ICalendarRepository calendarRepository,
             ICompanyRepository companyRepository,
-            IVehicleRepository vehicleRepository,
-            IVehicleTypeRepository vehicleTypeRepository
+            IVehicleRepository vehicleRepository
         )
         {
             Logger = logger;
@@ -37,7 +35,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             CalendarRepository = calendarRepository;
             CompanyRepository = companyRepository;
             VehicleRepository = vehicleRepository;
-            VehicleTypeRepository = vehicleTypeRepository;
         }
 
         // GET api/trip
@@ -104,7 +101,7 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             }
             catch (Exception e)
             {
-                Logger.LogError("Error adding deployment:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
+                Logger.LogError("Error adding trip:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
                 return BadRequest(e.ToString());
             }
             return Ok(Mapper.Map<TripDTO>(trip));
