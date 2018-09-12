@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 
 namespace PDX.PBOT.Scootertown.Data.Models.Dimensions
 {
-    public class Calendar
+    public class Calendar : DimensionBase
     {
-        public int Key { get; set; }
+        [NotMapped]
+        public new string Name { get; set; }
         public DateTime Date { get; set; }
         public byte Day { get; set; }
         public byte Weekday { get; set; }

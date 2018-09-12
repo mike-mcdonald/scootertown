@@ -19,7 +19,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         private readonly ICompanyRepository CompanyRepository;
         private readonly IVehicleRepository VehicleRepository;
         private readonly IVehicleTypeRepository VehicleTypeRepository;
-        private readonly IStatusRepository StatusRepository;
         private readonly ITripRepository TripRepository;
 
         public CollisionController(
@@ -29,7 +28,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             ICompanyRepository companyRepository,
             IVehicleRepository vehicleRepository,
             IVehicleTypeRepository vehicleTypeRepository,
-            IStatusRepository statusRepository,
             ITripRepository tripRepository
         )
         {
@@ -40,7 +38,6 @@ namespace PDX.PBOT.Scootertown.API.Controllers
             CompanyRepository = companyRepository;
             VehicleRepository = vehicleRepository;
             VehicleTypeRepository = vehicleTypeRepository;
-            StatusRepository = statusRepository;
             TripRepository = tripRepository;
         }
 

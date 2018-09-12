@@ -53,9 +53,16 @@ namespace scootertown.api
                 {
                     options.UseNpgsql(
                         Configuration.GetConnectionString("postgres"),
-                        o => o.UseNetTopologySuite()
+                        o =>
+                        {
+                            o.UseNetTopologySuite();
+                        }
                     );
                 }, ServiceLifetime.Transient);
+
+            services.AddMemoryCache(options =>
+            {
+            });
 
             // smaller dimension repositories get singletons to get better performance?
             services.AddTransient<ICompanyRepository, CompanyRepository>();

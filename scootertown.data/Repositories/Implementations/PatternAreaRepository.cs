@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using NetTopologySuite.Geometries;
 using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
@@ -10,7 +11,9 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 {
     public class PatternAreaRepository : DimensionRepositoryBase<PatternArea>, IPatternAreaRepository
     {
-        public PatternAreaRepository(ScootertownDbContext context) : base(context) { }
+        public PatternAreaRepository(ScootertownDbContext context, IMemoryCache cache) : base(context, cache)
+        {
+        }
 
         public override async Task<PatternArea> Add(PatternArea item, bool saveImmediately)
         {

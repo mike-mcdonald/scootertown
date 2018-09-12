@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PDX.PBOT.Scootertown.Data.Models;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
@@ -38,7 +37,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories
             return item;
         }
 
-        public abstract Task<T> Find(string alernateKey);
+        public abstract Task<T> Find(string alternateKey);
 
         public virtual async Task<T> Update(T item, bool saveImmediately = true)
         {

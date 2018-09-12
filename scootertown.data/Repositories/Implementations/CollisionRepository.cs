@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using PDX.PBOT.Scootertown.Data.Concrete;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
 
@@ -9,7 +10,7 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
 {
     public class CollisionRepository : RepositoryBase<Collision>, ICollisionRepository
     {
-        public CollisionRepository(DbContext context) : base(context)
+        public CollisionRepository(ScootertownDbContext context) : base(context)
         {
         }
 
