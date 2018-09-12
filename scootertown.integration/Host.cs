@@ -136,8 +136,6 @@ namespace PDX.PBOT.Scootertown.Integration
                                     {
                                         var tripService = Container.GetInstance<ITripService>();
 
-                                        var offset = await tripService.GetTotalTrips(manager.Company);
-
                                         var trips = await manager.RetrieveTrips();
 
                                         if (trips.Count == 0)
