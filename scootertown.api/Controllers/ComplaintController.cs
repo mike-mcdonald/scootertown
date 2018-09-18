@@ -71,13 +71,15 @@ namespace PDX.PBOT.Scootertown.API.Controllers
 
             var calendarTask = CalendarRepository.Find(value.SubmittedDate);
             var companyTask = CompanyRepository.Find(value.CompanyName);
-            var vehicleTask = VehicleRepository.Find(value.VehicleName);
+            var vehicleTask = !string.IsNullOrEmpty(value.VehicleName) ?
+                VehicleRepository.Find(value.VehicleName) : Task.FromResult<Vehicle>(null);
 
             complaint.SubmittedDateKey = (await calendarTask).Key;
             complaint.CompanyKey = (await companyTask).Key;
 
-            var vehicle = await vehicleTask ?? await VehicleRepository.Add(new Vehicle { Name = value.VehicleName });
-            complaint.VehicleKey = vehicle.Key;
+            var vehicle = !string.IsNullOrEmpty(value.VehicleName) ?
+                await vehicleTask ?? await VehicleRepository.Add(new Vehicle { Name = value.VehicleName }) : null;
+            complaint.VehicleKey = vehicle?.Key;
 
             return complaint;
         }

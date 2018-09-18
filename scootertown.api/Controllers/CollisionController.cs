@@ -86,7 +86,7 @@ namespace PDX.PBOT.Scootertown.API.Controllers
 
             collision.DateKey = (await calendarTask).Key;
             collision.CompanyKey = (await companyTask).Key;
-            collision.VehicleKey = vehicle.Key;
+            collision.VehicleKey = vehicle?.Key;
 
             return collision;
         }

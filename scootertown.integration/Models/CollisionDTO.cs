@@ -1,5 +1,6 @@
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 
 namespace PDX.PBOT.Scootertown.Integration.Models
 {
@@ -10,13 +11,15 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "company_name")]
         public string CompanyName { get; set; }
         [JsonProperty(PropertyName = "device_type")]
-        public byte? VehicleTypeKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? VehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "device_id")]
         public string VehicleName { get; set; }
         [JsonProperty(PropertyName = "other_user")]
         public bool OtherUser { get; set; }
         [JsonProperty(PropertyName = "other_vehicle")]
-        public byte? OtherVehicleTypeKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? OtherVehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "trip_id")]
         public string TripAlternateKey { get; set; }
         [JsonProperty(PropertyName = "location")]
@@ -32,7 +35,8 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "state_report")]
         public bool StateReport { get; set; }
         [JsonProperty(PropertyName = "claim_status")]
-        public byte? ClaimStatusKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? ClaimStatusKey { get; set; }
         [JsonProperty("reports")]
         public string[] Reports { get; set; }
     }

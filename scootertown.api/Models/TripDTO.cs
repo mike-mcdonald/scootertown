@@ -25,7 +25,7 @@ namespace PDX.PBOT.Scootertown.API.Models
         public string ParkingVerification { get; set; }
         public int CompanyKey { get; set; }
         public string CompanyName { get; set; }
-        public byte? VehicleTypeKey { get; set; }
+        public int? VehicleTypeKey { get; set; }
         public string VehicleTypeName { get; set; }
         public int? VehicleKey { get; set; }
         public string VehicleName { get; set; }

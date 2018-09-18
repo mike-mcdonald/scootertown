@@ -172,7 +172,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
 
                 vehicle.HasKey(x => x.Key);
 
-                vehicle.Property(x => x.Name);
+                vehicle.Property(x => x.Name).HasMaxLength(200).IsRequired();
                 vehicle.Property(x => x.Registered);
 
                 vehicle.HasIndex(x => x.Name).IsUnique();
