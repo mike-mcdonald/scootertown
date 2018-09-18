@@ -21,6 +21,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
         public readonly DeploymentRepository DeploymentRepository;
         public readonly TripRepository TripRepository;
         public readonly CollisionRepository CollisionRepository;
+        public readonly ComplaintRepository ComplaintRepository;
         public readonly CalendarRepository CalendarRepository;
         public readonly CompanyRepository CompanyRepository;
         public readonly NeighborhoodRepository NeighborhoodRepository;
@@ -39,6 +40,7 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
                 cfg.AddProfile<DeploymentProfile>();
                 cfg.AddProfile<TripProfile>();
                 cfg.AddProfile<CollisionProfile>();
+                cfg.AddProfile<ComplaintProfile>();
             });
 
 
@@ -49,10 +51,23 @@ namespace PDX.PBOT.Scootertown.API.Test.Common
 
             var context = new ScootertownDbContext(options, new VehicleStoreOptions());
             var cache = new Mock<IMemoryCache>();
+            var entry = new Mock<ICacheEntry>();
+
+            int expectedKey = 1;
+            object expectedValue = expectedKey;
+
+            cache
+                .Setup(x => x.TryGetValue(It.IsAny<object>(), out expectedValue))
+                .Returns(true);
+            cache
+                .Setup(m => m.CreateEntry(It.IsAny<object>()))
+                .Returns(entry.Object);
+
 
             DeploymentRepository = new DeploymentRepository(context);
             TripRepository = new TripRepository(context);
             CollisionRepository = new CollisionRepository(context);
+            ComplaintRepository = new ComplaintRepository(context);
             CalendarRepository = new CalendarRepository(context, cache.Object);
             CompanyRepository = new CompanyRepository(context, cache.Object);
             NeighborhoodRepository = new NeighborhoodRepository(context, cache.Object);
