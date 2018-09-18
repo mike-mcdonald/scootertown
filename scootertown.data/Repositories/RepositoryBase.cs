@@ -18,6 +18,8 @@ namespace PDX.PBOT.Scootertown.Data.Repositories
             Context = context;
         }
 
+        public IQueryable<T> Queryable() => Context.Set<T>().AsQueryable();
+
         public virtual async Task<T> Add(T item, bool saveImmediately)
         {
             var dbItem = await Context.Set<T>().AddAsync(item);
