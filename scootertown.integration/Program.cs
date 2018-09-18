@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -152,6 +153,11 @@ namespace PDX.PBOT.Scootertown.Integration
                     container.Register(ConfigureLogger, Lifestyle.Singleton);
 
                     container.Register(typeof(ILogger<>), typeof(LoggingAdapter<>), Lifestyle.Scoped);
+
+                    container.Register<IMemoryCache>(() =>
+                    {
+                        return new MemoryCache(new MemoryCacheOptions());
+                    }, Lifestyle.Singleton);
 
                     container.Verify();
 
