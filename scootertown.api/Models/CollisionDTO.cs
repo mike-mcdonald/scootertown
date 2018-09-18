@@ -27,7 +27,7 @@ namespace PDX.PBOT.Scootertown.API.Models
         public string OtherVehicleTypeName { get; set; }
         public long? TripKey { get; set; }
         public string TripAlternateKey { get; set; }
-        public byte? ClaimStatusKey { get; set; }
+        public int? ClaimStatusKey { get; set; }
         public string ClaimStatusName { get; set; }
         public int? NeighborhoodKey { get; set; }
         public string NeighborhoodName { get; set; }
