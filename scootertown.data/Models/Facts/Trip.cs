@@ -17,7 +17,11 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public DateTime FirstSeen { get; set; }
         public DateTime LastSeen { get; set; }
         public Point StartPoint { get; set; }
+        public double StartX { get; set; }
+        public double StartY { get; set; }
         public Point EndPoint { get; set; }
+        public double EndX { get; set; }
+        public double EndY { get; set; }
         public LineString Route { get; set; }
         public int Duration { get; set; }
         public int Distance { get; set; }

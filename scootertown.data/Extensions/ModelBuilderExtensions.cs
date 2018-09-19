@@ -315,7 +315,11 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.Property(x => x.FirstSeen);
                 trip.Property(x => x.LastSeen);
                 trip.Property(x => x.StartPoint);
+                trip.Property(x => x.StartX);
+                trip.Property(x => x.StartY);
                 trip.Property(x => x.EndPoint);
+                trip.Property(x => x.EndX);
+                trip.Property(x => x.EndY);
                 trip.Property(x => x.Route);
                 trip.Property(x => x.Duration);
                 trip.Property(x => x.Distance);
