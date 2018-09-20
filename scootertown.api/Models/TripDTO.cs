@@ -14,7 +14,11 @@ namespace PDX.PBOT.Scootertown.API.Models
         public long Duration { get; set; }
         public long Distance { get; set; }
         public Point StartPoint { get; set; }
+        public double StartX { get; set; }
+        public double StartY { get; set; }
         public Point EndPoint { get; set; }
+        public double EndX { get; set; }
+        public double EndY { get; set; }
         public LineString Route { get; set; }
         public byte Accuracy { get; set; }
         public short? SampleRate { get; set; }
