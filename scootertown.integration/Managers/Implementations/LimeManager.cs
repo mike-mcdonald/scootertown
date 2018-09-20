@@ -68,6 +68,12 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var response = await Client.GetAsync($"trips?page={Offset}");
             if (response.IsSuccessStatusCode)
             {
+                if(response.Headers.GetValues("Content-Type").Where(x => x.Contains("text/html")).Count() > 0)
+                {
+                    // Lime returns an html page for their 500 error that indicates they ran out of trips to return
+                    //  return the empty queue.
+                    return trips;
+                }
                 trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
                 Offset += 1;
             }
