@@ -1,5 +1,6 @@
 
 using PDX.PBOT.Scootertown.Data.Options;
+using PDX.PBOT.Scootertown.Data.Models.Bridges;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,16 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
             if (!string.IsNullOrWhiteSpace(storeOptions.DefaultSchema)) modelBuilder.HasDefaultSchema(storeOptions.DefaultSchema);
 
             modelBuilder.HasPostgresExtension("postgis");
+
+            modelBuilder.Entity<Models.Bridges.StreetSegmentGroup>(group =>
+            {
+                group.ToTable(storeOptions.BridgeStreetSegmentGroup);
+
+                group.HasKey(x => new { x.StreetSegmentGroupKey, x.StreetSegmentKey });
+
+                group.HasOne(x => x.StreetSegment).WithMany(x => x.Bridges).HasForeignKey(x => x.StreetSegmentKey);
+                group.HasOne(x => x.SegmentGroup).WithMany(x => x.Bridges).HasForeignKey(x => x.StreetSegmentGroupKey);
+            });
 
             modelBuilder.Entity<Calendar>(calendar =>
             {
@@ -164,6 +175,35 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 status.HasIndex(x => x.Name).IsUnique();
 
                 status.HasMany(x => x.Collisions).WithOne(x => x.ClaimStatus).HasForeignKey(x => x.ClaimStatusKey);
+            });
+
+            modelBuilder.Entity<StreetSegment>(segment =>
+            {
+                segment.ToTable(storeOptions.StreetSegment);
+
+                segment.HasKey(x => x.Key);
+
+                segment.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                segment.Property(x => x.AlternateKey).HasMaxLength(32).IsRequired();
+                segment.Property(x => x.Geometry);
+                segment.Property(x => x.X);
+                segment.Property(x => x.Y);
+                segment.Property(x => x.Buffer);
+
+                segment.HasIndex(x => x.AlternateKey).IsUnique();
+                segment.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
+
+                segment.HasMany(x => x.Bridges).WithOne(x => x.StreetSegment).HasForeignKey(x => x.StreetSegmentKey);
+            });
+
+            modelBuilder.Entity<Models.Dimensions.StreetSegmentGroup>(group =>
+            {
+                group.ToTable(storeOptions.DimStreetSegmentGroup);
+
+                group.HasKey(x => x.Key);
+
+                group.HasMany(x => x.Bridges).WithOne(x => x.SegmentGroup).HasForeignKey(x => x.StreetSegmentGroupKey);
+                group.HasOne(x => x.Trip).WithOne(x => x.StreetSegmentGroup).HasForeignKey("StreetSegmentGroupKey");
             });
 
             modelBuilder.Entity<Vehicle>(vehicle =>
