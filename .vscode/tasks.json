@@ -34,6 +34,16 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "migration add",
+            "command": "dotnet ef migrations --startup-project scootertown.integration --project scootertown.data add update",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "migration remove",
             "command": "dotnet ef migrations --startup-project scootertown.integration --project scootertown.data remove",
             "type": "shell",
