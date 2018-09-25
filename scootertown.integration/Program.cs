@@ -90,6 +90,7 @@ namespace PDX.PBOT.Scootertown.Integration
                         cfg.AddProfile<ComplaintProfile>();
                         cfg.AddProfile<NeighborhoodProfile>();
                         cfg.AddProfile<PatternAreaProfile>();
+                        cfg.AddProfile<StreetSegmentProfile>();
                         cfg.AddProfile<GeoJsonProfile>();
                     });
 
@@ -124,6 +125,10 @@ namespace PDX.PBOT.Scootertown.Integration
                             PatternAreasFile = Path.Combine(
                                 context.HostingEnvironment.ContentRootPath,
                                 context.Configuration.GetValue<string>("PatternAreasFile")
+                            ),
+                            StreetSegmentsFile = Path.Combine(
+                                context.HostingEnvironment.ContentRootPath,
+                                context.Configuration.GetValue<string>("StreetSegmentsFile")
                             )
                         };
                         return options;
@@ -142,6 +147,8 @@ namespace PDX.PBOT.Scootertown.Integration
                     // add generic services for repositories for any geojson we'll read in
                     container.Register<INeighborhoodRepository, NeighborhoodRepository>(Lifestyle.Scoped);
                     container.Register<IPatternAreaRepository, PatternAreaRepository>(Lifestyle.Scoped);
+                    container.Register<IStreetSegmentRepository, StreetSegmentRepository>(Lifestyle.Scoped);
+                    container.Register<IStreetSegmentGroupRepository, StreetSegmentGroupRepository>(Lifestyle.Scoped);
 
                     container.Register<ITripService, TripService>(Lifestyle.Scoped);
                     container.Register<IDeploymentService, DeploymentService>(Lifestyle.Scoped);
@@ -149,6 +156,7 @@ namespace PDX.PBOT.Scootertown.Integration
                     container.Register<IComplaintService, ComplaintService>(Lifestyle.Scoped);
                     container.Register<INeighborhoodService, NeighborhoodService>(Lifestyle.Scoped);
                     container.Register<IPatternAreaService, PatternAreaService>(Lifestyle.Scoped);
+                    container.Register<IStreetSegmentService, StreetSegmentService>(Lifestyle.Scoped);
 
                     container.Register(ConfigureLogger, Lifestyle.Singleton);
 
