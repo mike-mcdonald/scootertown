@@ -29,6 +29,7 @@
     <Content Include="../appsettings.json" CopyToOutputDirectory="Always" />
     <Content Include="../neighborhoods.json" CopyToOutputDirectory="Always" />
     <Content Include="../pattern_areas.json" CopyToOutputDirectory="Always" />
+    <Content Include="../street_segment_midpoints.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <PropertyGroup>
