@@ -14,7 +14,10 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         readonly VehicleStoreOptions StoreOptions;
         // Bridges
         public DbSet<Models.Bridges.StreetSegmentGroup> BridgeStreetSegmentGroups { get; set; }
+        public DbSet<Models.Bridges.BicyclePathGroup> BridgeBicyclePathGroups { get; set; }
         // Dimensions
+        public DbSet<BicyclePath> BicyclePaths { get; set; }
+        public DbSet<BicyclePathGroup> BicyclePathGroups { get; set; }
         public DbSet<Calendar> Calendar { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<ComplaintType> ComplaintTypes { get; set; }
@@ -47,7 +50,8 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
             modelBuilder.ConfigureContext(StoreOptions);
             modelBuilder.SeedData();
 
-            // Override so I can test
+            // Override so I can test with in-memory provider
+            //  In-memory provider doesn't have support for geometry types
             if (!Database.ProviderName.StartsWith("Npgsql"))
             {
                 modelBuilder.Entity<Collision>(b => b.Ignore(e => e.Location));
@@ -59,6 +63,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
                 modelBuilder.Entity<Neighborhood>(b => b.Ignore(e => e.Geometry));
                 modelBuilder.Entity<PatternArea>(b => b.Ignore(e => e.Geometry));
                 modelBuilder.Entity<StreetSegment>(b => b.Ignore(e => e.Geometry));
+                modelBuilder.Entity<BicyclePath>(b => b.Ignore(e => e.Geometry));
             }
 
             base.OnModelCreating(modelBuilder);
