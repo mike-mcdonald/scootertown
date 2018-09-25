@@ -40,5 +40,6 @@ namespace PDX.PBOT.Scootertown.API.Models
         public byte PaymentTypeKey { get; set; }
         public byte PaymentAccessKey { get; set; }
         public long? StreetSegmentGroupKey { get; set; }
+        public long? BicyclePathGroupKey { get; set; }
     }
 }
