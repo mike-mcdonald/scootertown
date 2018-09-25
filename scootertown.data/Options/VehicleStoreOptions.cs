@@ -2,8 +2,6 @@ namespace PDX.PBOT.Scootertown.Data.Options
 {
     public class VehicleStoreOptions
     {
-
-
         public string DefaultSchema { get; set; } = null;
 
         public TableConfiguration BridgeStreetSegmentGroup { get; set; } = new TableConfiguration("streetsegmentgroup", "bridge");
