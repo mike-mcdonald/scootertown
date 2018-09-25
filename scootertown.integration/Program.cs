@@ -91,6 +91,7 @@ namespace PDX.PBOT.Scootertown.Integration
                         cfg.AddProfile<NeighborhoodProfile>();
                         cfg.AddProfile<PatternAreaProfile>();
                         cfg.AddProfile<StreetSegmentProfile>();
+                        cfg.AddProfile<BicyclePathProfile>();
                         cfg.AddProfile<GeoJsonProfile>();
                     });
 
@@ -129,6 +130,10 @@ namespace PDX.PBOT.Scootertown.Integration
                             StreetSegmentsFile = Path.Combine(
                                 context.HostingEnvironment.ContentRootPath,
                                 context.Configuration.GetValue<string>("StreetSegmentsFile")
+                            ),
+                            BicyclePathsFile = Path.Combine(
+                                context.HostingEnvironment.ContentRootPath,
+                                context.Configuration.GetValue<string>("BicyclePathsFile")
                             )
                         };
                         return options;
@@ -149,6 +154,8 @@ namespace PDX.PBOT.Scootertown.Integration
                     container.Register<IPatternAreaRepository, PatternAreaRepository>(Lifestyle.Scoped);
                     container.Register<IStreetSegmentRepository, StreetSegmentRepository>(Lifestyle.Scoped);
                     container.Register<IStreetSegmentGroupRepository, StreetSegmentGroupRepository>(Lifestyle.Scoped);
+                    container.Register<IBicyclePathRepository, BicyclePathRepository>(Lifestyle.Scoped);
+                    container.Register<IBicyclePathGroupRepository, BicyclePathGroupRepository>(Lifestyle.Scoped);
 
                     container.Register<ITripService, TripService>(Lifestyle.Scoped);
                     container.Register<IDeploymentService, DeploymentService>(Lifestyle.Scoped);
@@ -157,6 +164,7 @@ namespace PDX.PBOT.Scootertown.Integration
                     container.Register<INeighborhoodService, NeighborhoodService>(Lifestyle.Scoped);
                     container.Register<IPatternAreaService, PatternAreaService>(Lifestyle.Scoped);
                     container.Register<IStreetSegmentService, StreetSegmentService>(Lifestyle.Scoped);
+                    container.Register<IBicyclePathService, BicyclePathService>(Lifestyle.Scoped);
 
                     container.Register(ConfigureLogger, Lifestyle.Singleton);
 

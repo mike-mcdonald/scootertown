@@ -90,6 +90,19 @@ namespace PDX.PBOT.Scootertown.Integration
                 Logger.LogError("Caught exception reading street segment data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
             }
 
+            Logger.LogDebug("Reading bicycle paths...");
+            try
+            {
+                using (AsyncScopedLifestyle.BeginScope(Container))
+                {
+                    await Container.GetInstance<IBicyclePathService>().Save();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Caught exception reading bicycle path data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
+            }
+
             DeploymentTimer = new Timer(obj =>
             {
                 foreach (var manager in Managers)
