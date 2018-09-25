@@ -59,6 +59,6 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public long? StreetSegmentGroupKey { get; set; }
         public StreetSegmentGroup StreetSegmentGroup { get; set; }
 
-        public IEnumerable<Collision> Collisions { get; set; }
+        public ICollection<Collision> Collisions { get; set; }
     }
 }
