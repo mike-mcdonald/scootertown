@@ -21,6 +21,10 @@ neighborhoods.json
 eastportland.json
 ## layer manager/zoning codes/portland pattern areas
 pattern_areas.json
+## http://gis-pdx.opendata.arcgis.com/datasets/streets
+street_segments.json
+## node segments.js
+street_segment_midpoints.json
 
 # Manage migrations on a per-deployment basis
 [Mm]igrations/
