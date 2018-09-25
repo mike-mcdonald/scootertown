@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 
 namespace PDX.PBOT.Scootertown.Integration.Models
 {
@@ -11,7 +12,8 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "company_name")]
         public string CompanyName { get; set; }
         [JsonProperty(PropertyName = "device_type")]
-        public byte VehicleTypeKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? VehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "device_id")]
         public string VehicleName { get; set; }
         [JsonProperty(PropertyName = "trip_id")]
@@ -45,8 +47,10 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "average_speed")]
         public byte? AverageSpeed { get; set; }
         [JsonProperty(PropertyName = "payment_type")]
-        public byte PaymentTypeKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? PaymentTypeKey { get; set; }
         [JsonProperty(PropertyName = "payment_access")]
-        public byte PaymentAccessKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? PaymentAccessKey { get; set; }
     }
 }

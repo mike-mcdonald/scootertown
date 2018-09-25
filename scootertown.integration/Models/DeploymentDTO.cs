@@ -1,5 +1,6 @@
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
+using PDX.PBOT.Scootertown.Infrastructure.JSON;
 
 namespace PDX.PBOT.Scootertown.Integration.Models
 {
@@ -8,7 +9,8 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "company_name")]
         public string CompanyName { get; set; }
         [JsonProperty(PropertyName = "device_type")]
-        public byte VehicleTypeKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? VehicleTypeKey { get; set; }
         [JsonProperty(PropertyName = "device_id")]
         public string VehicleName { get; set; }
         [JsonProperty(PropertyName = "battery_level")]
@@ -16,11 +18,13 @@ namespace PDX.PBOT.Scootertown.Integration.Models
         [JsonProperty(PropertyName = "location")]
         public Point Location { get; set; }
         [JsonProperty(PropertyName = "placement_reason")]
-        public byte PlacementReasonKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? PlacementReasonKey { get; set; }
         [JsonProperty(PropertyName = "allowed_placement")]
         public bool AllowedPlacement { get; set; }
         [JsonProperty(PropertyName = "pickup_reason")]
-        public byte PickupReasonKey { get; set; }
+        [JsonConverter(typeof(SafeDimensionKeyConverter))]
+        public int? PickupReasonKey { get; set; }
         [JsonProperty(PropertyName = "is_reserved")]
         public bool Reserved { get; set; }
         [JsonProperty(PropertyName = "is_disabled")]
