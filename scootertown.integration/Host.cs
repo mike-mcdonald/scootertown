@@ -76,6 +76,20 @@ namespace PDX.PBOT.Scootertown.Integration
                 Logger.LogError("Caught exception reading pattern area data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
             }
 
+
+            Logger.LogDebug("Reading street segements...");
+            try
+            {
+                using (AsyncScopedLifestyle.BeginScope(Container))
+                {
+                    await Container.GetInstance<IStreetSegmentService>().Save();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Caught exception reading street segment data:\n{message}\n{inner}", e.Message, e.InnerException?.Message);
+            }
+
             DeploymentTimer = new Timer(obj =>
             {
                 foreach (var manager in Managers)

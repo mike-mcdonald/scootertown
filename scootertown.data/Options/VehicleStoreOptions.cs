@@ -2,8 +2,11 @@ namespace PDX.PBOT.Scootertown.Data.Options
 {
     public class VehicleStoreOptions
     {
+
+
         public string DefaultSchema { get; set; } = null;
 
+        public TableConfiguration BridgeStreetSegmentGroup { get; set; } = new TableConfiguration("streetsegmentgroup", "bridge");
         public TableConfiguration Calendar { get; set; } = new TableConfiguration("calendar", "dim");
         public TableConfiguration Company { get; set; } = new TableConfiguration("company", "dim");
         public TableConfiguration ComplaintType { get; set; } = new TableConfiguration("complainttype", "dim");
@@ -13,6 +16,8 @@ namespace PDX.PBOT.Scootertown.Data.Options
         public TableConfiguration PlacementReason { get; set; } = new TableConfiguration("placementreason", "dim");
         public TableConfiguration RemovalReason { get; set; } = new TableConfiguration("removalreason", "dim");
         public TableConfiguration Status { get; set; } = new TableConfiguration("status", "dim");
+        public TableConfiguration DimStreetSegmentGroup { get; set; } = new TableConfiguration("streetsegmentgroup", "dim");
+        public TableConfiguration StreetSegment { get; set; } = new TableConfiguration("streetsegment", "dim");
         public TableConfiguration Vehicle { get; set; } = new TableConfiguration("vehicle", "dim");
         public TableConfiguration VehicleType { get; set; } = new TableConfiguration("vehicletype", "dim");
 

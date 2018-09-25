@@ -12,6 +12,8 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
     public class ScootertownDbContext : DbContext
     {
         readonly VehicleStoreOptions StoreOptions;
+        // Bridges
+        public DbSet<Models.Bridges.StreetSegmentGroup> BridgeStreetSegmentGroups { get; set; }
         // Dimensions
         public DbSet<Calendar> Calendar { get; set; }
         public DbSet<Company> Companies { get; set; }
@@ -22,6 +24,8 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
         public DbSet<PlacementReason> PlacementReasons { get; set; }
         public DbSet<RemovalReason> RemovalReasons { get; set; }
         public DbSet<Status> Statuses { get; set; }
+        public DbSet<StreetSegment> StreetSegments { get; set; }
+        public DbSet<StreetSegmentGroup> StreetSegmentGroups { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<VehicleType> VehicleTypes { get; set; }
         // Facts
@@ -54,6 +58,7 @@ namespace PDX.PBOT.Scootertown.Data.Concrete
                 modelBuilder.Entity<Trip>(b => b.Ignore(e => e.Route));
                 modelBuilder.Entity<Neighborhood>(b => b.Ignore(e => e.Geometry));
                 modelBuilder.Entity<PatternArea>(b => b.Ignore(e => e.Geometry));
+                modelBuilder.Entity<StreetSegment>(b => b.Ignore(e => e.Geometry));
             }
 
             base.OnModelCreating(modelBuilder);

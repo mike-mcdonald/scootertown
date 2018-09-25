@@ -56,6 +56,8 @@ namespace PDX.PBOT.Scootertown.Data.Models.Facts
         public PaymentType PaymentType { get; set; }
         public int PaymentAccessKey { get; set; }
         public PaymentType PaymentAccess { get; set; }
+        public long? StreetSegmentGroupKey { get; set; }
+        public StreetSegmentGroup StreetSegmentGroup { get; set; }
 
         public IEnumerable<Collision> Collisions { get; set; }
     }
