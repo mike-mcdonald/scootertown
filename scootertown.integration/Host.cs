@@ -119,7 +119,7 @@ namespace PDX.PBOT.Scootertown.Integration
                             }
                             catch (Exception e)
                             {
-                                Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                                Logger.LogError("Caught exception processing data:\n{message}\n{inner}\n{trace}", e.Message, e.InnerException?.Message, e.StackTrace);
                             }
                             finally
                             {
@@ -167,7 +167,7 @@ namespace PDX.PBOT.Scootertown.Integration
                                 }
                                 catch (System.Exception e)
                                 {
-                                    Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                                    Logger.LogError("Caught exception processing data:\n{message}\n{inner}\n{trace}", e.Message, e.InnerException?.Message, e.StackTrace);
                                 }
                                 finally
                                 {
@@ -209,7 +209,7 @@ namespace PDX.PBOT.Scootertown.Integration
                         }
                         catch (Exception e)
                         {
-                            Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                            Logger.LogError("Caught exception processing data:\n{message}\n{inner}\n{trace}", e.Message, e.InnerException?.Message, e.StackTrace);
                         }
                     });
                 }
@@ -240,7 +240,7 @@ namespace PDX.PBOT.Scootertown.Integration
                     }
                     catch (Exception e)
                     {
-                        Logger.LogError("Caught exception processing data:\n{message}\n{trace}", e.Message, e.StackTrace);
+                        Logger.LogError("Caught exception processing data:\n{message}\n{inner}\n{trace}", e.Message, e.InnerException?.Message, e.StackTrace);
                     }
                 });
                 }
