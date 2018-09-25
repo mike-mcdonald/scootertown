@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GeoJSON.Net.Feature;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using PDX.PBOT.Scootertown.API.Models;
 using PDX.PBOT.Scootertown.Data.Models.Dimensions;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Data.Repositories.Interfaces;
+using PDX.PBOT.Scootertown.Infrastructure.Extensions;
 
 namespace PDX.PBOT.Scootertown.API.Controllers
 {
@@ -55,6 +57,53 @@ namespace PDX.PBOT.Scootertown.API.Controllers
         [HttpGet("{company}")]
         public async Task<long> GetAsync(string company) =>
             await TripRepository.CountByCompany(company);
+
+        [HttpGet("as/geojson")]
+        public async Task<IActionResult> GetAsGeojsonAsync()
+        {
+            var tripsTask = TripRepository.All();
+
+            var featureCollection = new FeatureCollection();
+
+            try
+            {
+                var trips = await tripsTask;
+
+                featureCollection.Features.AddRange(trips.Select(t => Mapper.Map<Feature>(t)));
+
+                return Ok(featureCollection);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Error retrieving trips: {message}", e.Message);
+                return BadRequest(e.ToString());
+            }
+        }
+
+        [HttpGet("by/neighborhood")]
+        public async Task<IActionResult> ByNeighborhoodAsync()
+        {
+            var result = await TripRepository.Queryable()
+                .GroupBy(
+                    x => new
+                    {
+                        NeighborhoodStartName = x.NeighborhoodStart.Name,
+                        NeighborhoodEndName = x.NeighborhoodEnd.Name
+                    },
+                    x => x,
+                    (key, g) => new
+                    {
+                        NeighborhoodStartName = key.NeighborhoodStartName,
+                        NeighborhoodEndName = key.NeighborhoodEndName,
+                        Trips = g.Select(x => x.Route.ToGeoJson<GeoJSON.Net.Geometry.LineString>()).ToList()
+                    }
+                )
+                .ToAsyncEnumerable()
+                .ToList();
+
+            return Ok(result);
+
+        }
 
         // POST api/trip
         [HttpPost]
