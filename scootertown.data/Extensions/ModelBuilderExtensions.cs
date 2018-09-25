@@ -203,7 +203,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 group.HasKey(x => x.Key);
 
                 group.HasMany(x => x.Bridges).WithOne(x => x.SegmentGroup).HasForeignKey(x => x.StreetSegmentGroupKey);
-                group.HasOne(x => x.Trip).WithOne(x => x.StreetSegmentGroup).HasForeignKey("StreetSegmentGroupKey");
+                group.HasOne(x => x.Trip).WithOne(x => x.StreetSegmentGroup).HasForeignKey<Trip>(x => x.StreetSegmentGroupKey);
             });
 
             modelBuilder.Entity<Vehicle>(vehicle =>
@@ -400,6 +400,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.HasOne(x => x.VehicleType).WithMany(x => x.Trips).HasForeignKey(x => x.VehicleTypeKey);
                 trip.HasOne(x => x.NeighborhoodStart).WithMany(x => x.TripsStarted).HasForeignKey(x => x.NeighborhoodStartKey);
                 trip.HasOne(x => x.NeighborhoodEnd).WithMany(x => x.TripsEnded).HasForeignKey(x => x.NeighborhoodEndKey);
+                trip.HasOne(x => x.StreetSegmentGroup).WithOne(x => x.Trip).HasForeignKey<Trip>(x => x.StreetSegmentGroupKey);
             });
 
             // transform everything to lowercase
