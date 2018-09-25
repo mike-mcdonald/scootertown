@@ -35,6 +35,45 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 group.HasOne(x => x.SegmentGroup).WithMany(x => x.Bridges).HasForeignKey(x => x.StreetSegmentGroupKey);
             });
 
+            modelBuilder.Entity<Models.Bridges.BicyclePathGroup>(group =>
+            {
+                group.ToTable(storeOptions.BridgeBicyclePathGroup);
+
+                group.HasKey(x => new { x.BicyclePathGroupKey, x.BicyclePathKey });
+
+                group.HasOne(x => x.BicyclePath).WithMany(x => x.Bridges).HasForeignKey(x => x.BicyclePathKey);
+                group.HasOne(x => x.PathGroup).WithMany(x => x.Bridges).HasForeignKey(x => x.BicyclePathGroupKey);
+            });
+
+            modelBuilder.Entity<BicyclePath>(path =>
+            {
+                path.ToTable(storeOptions.BicyclePath);
+
+                path.HasKey(x => x.Key);
+
+                path.Property(x => x.Name).HasMaxLength(200).IsRequired();
+                path.Property(x => x.AlternateKey).HasMaxLength(32).IsRequired();
+                path.Property(x => x.Geometry);
+                path.Property(x => x.X);
+                path.Property(x => x.Y);
+                path.Property(x => x.Buffer);
+
+                path.HasIndex(x => x.AlternateKey).IsUnique();
+                path.HasIndex(x => x.Geometry).ForNpgsqlHasMethod("gist");
+
+                path.HasMany(x => x.Bridges).WithOne(x => x.BicyclePath).HasForeignKey(x => x.BicyclePathKey);
+            });
+
+            modelBuilder.Entity<Models.Dimensions.BicyclePathGroup>(group =>
+            {
+                group.ToTable(storeOptions.DimBicyclePathGroup);
+
+                group.HasKey(x => x.Key);
+
+                group.HasMany(x => x.Bridges).WithOne(x => x.PathGroup).HasForeignKey(x => x.BicyclePathGroupKey);
+                group.HasOne(x => x.Trip).WithOne(x => x.BicyclePathGroup).HasForeignKey<Trip>(x => x.BicyclePathGroupKey);
+            });
+
             modelBuilder.Entity<Calendar>(calendar =>
             {
                 calendar.ToTable(storeOptions.Calendar);
@@ -381,6 +420,8 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.Property(x => x.PaymentAccessKey);
                 trip.Property(x => x.NeighborhoodStartKey);
                 trip.Property(x => x.NeighborhoodEndKey);
+                trip.Property(x => x.StreetSegmentGroupKey);
+                trip.Property(x => x.BicyclePathGroupKey);
 
                 // Indicies
                 trip.HasIndex(x => x.AlternateKey).IsUnique();
@@ -401,6 +442,7 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
                 trip.HasOne(x => x.NeighborhoodStart).WithMany(x => x.TripsStarted).HasForeignKey(x => x.NeighborhoodStartKey);
                 trip.HasOne(x => x.NeighborhoodEnd).WithMany(x => x.TripsEnded).HasForeignKey(x => x.NeighborhoodEndKey);
                 trip.HasOne(x => x.StreetSegmentGroup).WithOne(x => x.Trip).HasForeignKey<Trip>(x => x.StreetSegmentGroupKey);
+                trip.HasOne(x => x.BicyclePathGroup).WithOne(x => x.Trip).HasForeignKey<Trip>(x => x.BicyclePathGroupKey);
             });
 
             // transform everything to lowercase
