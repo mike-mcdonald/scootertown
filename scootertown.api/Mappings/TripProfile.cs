@@ -1,6 +1,7 @@
-using System;
+using System.Collections.Generic;
 using AutoMapper;
-using GeoJSON.Net.Geometry;
+using GeoJSON.Net;
+using GeoJSON.Net.Feature;
 using PDX.PBOT.Scootertown.API.Models;
 using PDX.PBOT.Scootertown.Data.Models.Facts;
 using PDX.PBOT.Scootertown.Infrastructure.Extensions;
@@ -19,6 +20,9 @@ namespace PDX.PBOT.Scootertown.API.Mappings
                 .ForMember(d => d.Route, opt => opt.MapFrom(s => s.Route.ToGeoJson<GeoJSON.Net.Geometry.LineString>()))
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.StartDate.Date + s.StartTime))
                 .ForMember(d => d.EndTime, opt => opt.MapFrom(s => s.EndDate.Date + s.EndTime));
+
+            CreateMap<Trip, Feature>()
+                .ConstructUsing(s => new Feature(s.Route.ToGeoJson<GeoJSON.Net.Geometry.LineString>(), CreateProperties(s)));
 
             CreateMap<TripDTO, Trip>()
                 .ForMember(d => d.StartTime, opt => opt.MapFrom(s => s.StartTime.TimeOfDay))
@@ -42,7 +46,24 @@ namespace PDX.PBOT.Scootertown.API.Mappings
                 .ForMember(d => d.PatternAreaStart, opt => opt.Ignore())
                 .ForMember(d => d.PatternAreaEnd, opt => opt.Ignore())
                 .ForMember(d => d.PaymentType, opt => opt.Ignore())
-                .ForMember(d => d.PaymentAccess, opt => opt.Ignore());
+                .ForMember(d => d.PaymentAccess, opt => opt.Ignore())
+                .ForMember(d => d.StreetSegmentGroup, opt => opt.Ignore());
+        }
+
+        private Dictionary<string, object> CreateProperties(Trip trip)
+        {
+            var properties = new Dictionary<string, object>();
+            foreach (var property in trip.GetType().GetProperties())
+            {
+                if (
+                    !property.PropertyType.FullName.Contains("NetTopologySuite") &&
+                    !property.PropertyType.FullName.Contains("PDX.PBOT")
+                )
+                {
+                    properties.TryAdd(property.Name, property.GetValue(trip));
+                }
+            }
+            return properties;
         }
     }
 }
