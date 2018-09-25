@@ -20,19 +20,25 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
         private readonly ILogger Logger;
         private readonly INeighborhoodRepository NeighborhoodRepository;
         private readonly IPatternAreaRepository PatternAreaRepository;
+        private readonly IStreetSegmentRepository StreetSegmentRepository;
+        private readonly IStreetSegmentGroupRepository StreetSegmentGroupRepository;
         private readonly HttpClient HttpClient;
 
         public TripService(
             ILogger<TripService> logger,
             APIOptions options,
             INeighborhoodRepository neighborhoodRepository,
-            IPatternAreaRepository patternAreaRepository
+            IPatternAreaRepository patternAreaRepository,
+            IStreetSegmentRepository streetSegmentRepository,
+            IStreetSegmentGroupRepository streetSegmentGroupRepository
         )
         {
             Logger = logger;
 
             NeighborhoodRepository = neighborhoodRepository;
             PatternAreaRepository = patternAreaRepository;
+            StreetSegmentRepository = streetSegmentRepository;
+            StreetSegmentGroupRepository = streetSegmentGroupRepository;
 
             HttpClient = new HttpClient();
             HttpClient.BaseAddress = new Uri(options.BaseAddress);
@@ -56,11 +62,18 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
                 var neighborhoodEndTask = NeighborhoodRepository.Find(Mapper.Map<Point>(item.EndPoint));
                 var patternAreaStartTask = PatternAreaRepository.Find(Mapper.Map<Point>(item.StartPoint));
                 var patternAreaEndTask = PatternAreaRepository.Find(Mapper.Map<Point>(item.EndPoint));
+                var existingSegmentGroupTask = StreetSegmentGroupRepository.FindGroupKey(trip.AlternateKey);
 
                 trip.NeighborhoodStartKey = (await neighborhoodStartTask)?.Key;
                 trip.NeighborhoodEndKey = (await neighborhoodEndTask)?.Key;
                 trip.PatternAreaStartKey = (await patternAreaStartTask)?.Key;
                 trip.PatternAreaEndKey = (await patternAreaEndTask)?.Key;
+
+                // if we've already calculated a segment group, don't repeat the expensive process
+                trip.StreetSegmentGroupKey = await existingSegmentGroupTask ??
+                    (await StreetSegmentGroupRepository.CreateGroup(
+                        await StreetSegmentRepository.Find(Mapper.Map<LineString>(trip.Route))
+                    ))?.Key;
 
                 // add it to the database
                 try
