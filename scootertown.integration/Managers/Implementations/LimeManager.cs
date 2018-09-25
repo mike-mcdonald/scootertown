@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
@@ -20,15 +21,17 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var current = new List<DeploymentDTO>();
             do
             {
-                var response = await Client.GetAsync($"availability?page={page}");
-                if (response.IsSuccessStatusCode)
+                using (var response = await Client.GetAsync($"availability?page={page}"))
                 {
-                    current = (await response.DeserializeJson(new { max_page = 1, data = new List<DeploymentDTO>() })).data;
-                    total.AddRange(current);
-                }
-                else
-                {
-                    throw new Exception($"Error retrieving availability for {CompanyName}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        current = (await response.DeserializeJson(new { max_page = 1, data = new List<DeploymentDTO>() })).data;
+                        total.AddRange(current);
+                    }
+                    else
+                    {
+                        throw new Exception($"Error retrieving availability for {CompanyName}");
+                    }
                 }
                 page += 1;
             } while (current.Count > 0);
@@ -38,11 +41,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
-            var response = await Client.GetAsync("collisions");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("collisions"))
             {
-                var collisions = (await response.DeserializeJson(new { data = new Queue<CollisionDTO>() })).data;
-                return collisions;
+                if (response.IsSuccessStatusCode)
+                {
+                    var collisions = (await response.DeserializeJson(new { data = new Queue<CollisionDTO>() })).data;
+                    return collisions;
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -50,12 +55,14 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()
         {
-            var response = await Client.GetAsync("complaints");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("complaints"))
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var complaints = (await response.DeserializeJson(new { max_page = 1, data = new Queue<ComplaintDTO>() })).data;
-                return complaints;
+                if (response.IsSuccessStatusCode)
+                {
+                    var streamTask = await response.Content.ReadAsStringAsync();
+                    var complaints = (await response.DeserializeJson(new { max_page = 1, data = new Queue<ComplaintDTO>() })).data;
+                    return complaints;
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -65,21 +72,23 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
         {
             var trips = new Queue<TripDTO>();
 
-            var response = await Client.GetAsync($"trips?page={Offset}");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync($"trips?page={Offset}"))
             {
-                if(response.Headers.GetValues("Content-Type").Where(x => x.Contains("text/html")).Count() > 0)
+                if (response.IsSuccessStatusCode)
                 {
-                    // Lime returns an html page for their 500 error that indicates they ran out of trips to return
-                    //  return the empty queue.
-                    return trips;
+                    if (response.Content.Headers.ContentType.MediaType == "text/html")
+                    {
+                        // Lime returns an html page for their 500 error that indicates they ran out of trips to return
+                        //  return the empty queue.
+                        return trips;
+                    }
+                    trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
+                    Offset += 1;
                 }
-                trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
-                Offset += 1;
-            }
-            else
-            {
-                throw new Exception($"Error retrieving trips for {CompanyName}");
+                else
+                {
+                    throw new Exception($"Error retrieving trips for {CompanyName}");
+                }
             }
 
             return new Queue<TripDTO>(trips.Select(t => Mapper.Map<TripDTO>(t)).ToList());

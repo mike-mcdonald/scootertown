@@ -20,16 +20,18 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
             do
             {
-                var response = await Client.GetAsync($"availability?limit={limit}&offset={offset}");
-                if (response.IsSuccessStatusCode)
+                using (var response = await Client.GetAsync($"availability?limit={limit}&offset={offset}"))
                 {
-                    retrievedAvailability = (await response.DeserializeJson(new { availability = new List<DeploymentDTO>() })).availability;
-                    totalAvailability.AddRange(retrievedAvailability);
-                    offset += retrievedAvailability.Count;
-                }
-                else
-                {
-                    throw new Exception($"Error retrieving availability for {CompanyName}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        retrievedAvailability = (await response.DeserializeJson(new { availability = new List<DeploymentDTO>() })).availability;
+                        totalAvailability.AddRange(retrievedAvailability);
+                        offset += retrievedAvailability.Count;
+                    }
+                    else
+                    {
+                        throw new Exception($"Error retrieving availability for {CompanyName}");
+                    }
                 }
             } while (retrievedAvailability.Count != 0);
 
@@ -38,11 +40,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
-            var response = await Client.GetAsync("collisions");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("collisions"))
             {
-                var collisions = (await response.DeserializeJson(new { collisions = new Queue<CollisionDTO>() })).collisions;
-                return collisions;
+                if (response.IsSuccessStatusCode)
+                {
+                    var collisions = (await response.DeserializeJson(new { collisions = new Queue<CollisionDTO>() })).collisions;
+                    return collisions;
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -50,11 +54,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()
         {
-            var response = await Client.GetAsync("complaints");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("complaints"))
             {
-                var complaints = (await response.DeserializeJson(new { complaints = new Queue<ComplaintDTO>() })).complaints;
-                return complaints;
+                if (response.IsSuccessStatusCode)
+                {
+                    var complaints = (await response.DeserializeJson(new { complaints = new Queue<ComplaintDTO>() })).complaints;
+                    return complaints;
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -65,15 +71,17 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
             var limit = 500;
             var trips = new Queue<TripDTO>();
 
-            var response = await Client.GetAsync($"trips?limit={limit}&offset={Offset}");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync($"trips?limit={limit}&offset={Offset}"))
             {
-                trips = (await response.DeserializeJson(new { trips = new Queue<TripDTO>() })).trips;
-                Offset += trips.Count;
-            }
-            else
-            {
-                throw new Exception($"Error retrieving trips for {CompanyName}");
+                if (response.IsSuccessStatusCode)
+                {
+                    trips = (await response.DeserializeJson(new { trips = new Queue<TripDTO>() })).trips;
+                    Offset += trips.Count;
+                }
+                else
+                {
+                    throw new Exception($"Error retrieving trips for {CompanyName}");
+                }
             }
 
             return trips;

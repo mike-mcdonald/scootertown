@@ -18,11 +18,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
         {
-            var response = await Client.GetAsync("availability.json");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("availability.json"))
             {
-                var availability = await response.DeserializeJson(new List<DeploymentDTO>());
-                return new Queue<DeploymentDTO>(availability);
+                if (response.IsSuccessStatusCode)
+                {
+                    var availability = await response.DeserializeJson(new List<DeploymentDTO>());
+                    return new Queue<DeploymentDTO>(availability);
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -30,11 +32,13 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<CollisionDTO>> RetrieveCollisions()
         {
-            var response = await Client.GetAsync("collisions.json");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("collisions.json"))
             {
-                var collisions = await response.DeserializeJson(new Queue<CollisionDTO>());
-                return collisions;
+                if (response.IsSuccessStatusCode)
+                {
+                    var collisions = await response.DeserializeJson(new Queue<CollisionDTO>());
+                    return collisions;
+                }
             }
 
             throw new Exception($"Error retrieving collisions for {CompanyName}");
@@ -42,12 +46,14 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<ComplaintDTO>> RetrieveComplaints()
         {
-            var response = await Client.GetAsync("complaints.json");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync("complaints.json"))
             {
-                var streamTask = await response.Content.ReadAsStringAsync();
-                var complaints = await response.DeserializeJson(new Queue<ComplaintDTO>());
-                return complaints;
+                if (response.IsSuccessStatusCode)
+                {
+                    var streamTask = await response.Content.ReadAsStringAsync();
+                    var complaints = await response.DeserializeJson(new Queue<ComplaintDTO>());
+                    return complaints;
+                }
             }
 
             throw new Exception($"Error retrieving availability for {CompanyName}");
@@ -55,18 +61,20 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<TripDTO>> RetrieveTrips()
         {
-            var response = await Client.GetAsync($"trips.json");
-            if (response.IsSuccessStatusCode)
+            using (var response = await Client.GetAsync($"trips.json"))
             {
-                try
+                if (response.IsSuccessStatusCode)
                 {
-                    var trips = await response.DeserializeJson(new List<TripDTO>());
+                    try
+                    {
+                        var trips = await response.DeserializeJson(new List<TripDTO>());
 
-                    return new Queue<TripDTO>(trips);
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Error retrieving trips for {CompanyName}:\n{e.Message}");
+                        return new Queue<TripDTO>(trips);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception($"Error retrieving trips for {CompanyName}:\n{e.Message}");
+                    }
                 }
             }
 
