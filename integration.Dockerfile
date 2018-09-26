@@ -18,6 +18,8 @@ COPY scootertown.api/. ./scootertown.api/
 ADD ./appsettings.json .
 ADD ./neighborhoods.json .
 ADD ./pattern_areas.json .
+ADD ./street_segment_midpoints.json .
+ADD ./bike_path_midpoints.json .
 WORKDIR /app/scootertown.integration
 RUN dotnet publish -c Release -o out
 
