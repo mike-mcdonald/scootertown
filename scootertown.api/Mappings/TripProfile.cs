@@ -47,7 +47,8 @@ namespace PDX.PBOT.Scootertown.API.Mappings
                 .ForMember(d => d.PatternAreaEnd, opt => opt.Ignore())
                 .ForMember(d => d.PaymentType, opt => opt.Ignore())
                 .ForMember(d => d.PaymentAccess, opt => opt.Ignore())
-                .ForMember(d => d.StreetSegmentGroup, opt => opt.Ignore());
+                .ForMember(d => d.StreetSegmentGroup, opt => opt.Ignore())
+                .ForMember(d => d.BicyclePathGroup, opt => opt.Ignore());
         }
 
         private Dictionary<string, object> CreateProperties(Trip trip)

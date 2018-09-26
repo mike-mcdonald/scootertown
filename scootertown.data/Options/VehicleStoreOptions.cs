@@ -5,6 +5,9 @@ namespace PDX.PBOT.Scootertown.Data.Options
         public string DefaultSchema { get; set; } = null;
 
         public TableConfiguration BridgeStreetSegmentGroup { get; set; } = new TableConfiguration("streetsegmentgroup", "bridge");
+        public TableConfiguration BridgeBicyclePathGroup { get; set; } = new TableConfiguration("bicyclepathgroup", "bridge");
+        public TableConfiguration DimBicyclePathGroup { get; set; } = new TableConfiguration("bicyclepathgroup", "dim");
+        public TableConfiguration BicyclePath { get; set; } = new TableConfiguration("bicyclepath", "dim");
         public TableConfiguration Calendar { get; set; } = new TableConfiguration("calendar", "dim");
         public TableConfiguration Company { get; set; } = new TableConfiguration("company", "dim");
         public TableConfiguration ComplaintType { get; set; } = new TableConfiguration("complainttype", "dim");

@@ -25,6 +25,10 @@ pattern_areas.json
 street_segments.json
 ## node segments.js
 street_segment_midpoints.json
+## http://gis-pdx.opendata.arcgis.com/datasets/bicycle-network
+bike_paths.json
+## node bike_paths.js
+bike_path_midpoints.json
 
 # Manage migrations on a per-deployment basis
 [Mm]igrations/

@@ -30,6 +30,7 @@
     <Content Include="../neighborhoods.json" CopyToOutputDirectory="Always" />
     <Content Include="../pattern_areas.json" CopyToOutputDirectory="Always" />
     <Content Include="../street_segment_midpoints.json" CopyToOutputDirectory="Always" />
+    <Content Include="../bike_path_midpoints.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <PropertyGroup>

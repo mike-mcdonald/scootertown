@@ -22,6 +22,8 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
         private readonly IPatternAreaRepository PatternAreaRepository;
         private readonly IStreetSegmentRepository StreetSegmentRepository;
         private readonly IStreetSegmentGroupRepository StreetSegmentGroupRepository;
+        private readonly IBicyclePathRepository BicyclePathRepository;
+        private readonly IBicyclePathGroupRepository BicyclePathGroupRepository;
         private readonly HttpClient HttpClient;
 
         public TripService(
@@ -30,7 +32,9 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             INeighborhoodRepository neighborhoodRepository,
             IPatternAreaRepository patternAreaRepository,
             IStreetSegmentRepository streetSegmentRepository,
-            IStreetSegmentGroupRepository streetSegmentGroupRepository
+            IStreetSegmentGroupRepository streetSegmentGroupRepository,
+            IBicyclePathRepository bicyclePathRepository,
+            IBicyclePathGroupRepository bicyclePathGroupRepository
         )
         {
             Logger = logger;
@@ -39,6 +43,8 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
             PatternAreaRepository = patternAreaRepository;
             StreetSegmentRepository = streetSegmentRepository;
             StreetSegmentGroupRepository = streetSegmentGroupRepository;
+            BicyclePathRepository = bicyclePathRepository;
+            BicyclePathGroupRepository = bicyclePathGroupRepository;
 
             HttpClient = new HttpClient();
             HttpClient.BaseAddress = new Uri(options.BaseAddress);
@@ -58,22 +64,35 @@ namespace PDX.PBOT.Scootertown.Integration.Services.Implementations
 
                 var trip = Mapper.Map<API.Models.TripDTO>(item);
 
+                trip.StreetSegmentGroupKey = await StreetSegmentGroupRepository.FindGroupKey(trip.AlternateKey);
+                trip.BicyclePathGroupKey = await BicyclePathGroupRepository.FindGroupKey(trip.AlternateKey);
+
+                // if we've already calculated a segment group, don't repeat the expensive process
+                Task<List<StreetSegment>> segmentsTask = null;
+                if (trip.StreetSegmentGroupKey == null)
+                {
+                    segmentsTask = StreetSegmentRepository.Find(Mapper.Map<LineString>(trip.Route));
+                }
+                Task<List<BicyclePath>> pathsTask = null;
+                if (trip.BicyclePathGroupKey == null)
+                {
+                    pathsTask = BicyclePathRepository.Find(Mapper.Map<LineString>(trip.Route));
+                }
+
                 var neighborhoodStartTask = NeighborhoodRepository.Find(Mapper.Map<Point>(item.StartPoint));
                 var neighborhoodEndTask = NeighborhoodRepository.Find(Mapper.Map<Point>(item.EndPoint));
                 var patternAreaStartTask = PatternAreaRepository.Find(Mapper.Map<Point>(item.StartPoint));
                 var patternAreaEndTask = PatternAreaRepository.Find(Mapper.Map<Point>(item.EndPoint));
-                var existingSegmentGroupTask = StreetSegmentGroupRepository.FindGroupKey(trip.AlternateKey);
 
                 trip.NeighborhoodStartKey = (await neighborhoodStartTask)?.Key;
                 trip.NeighborhoodEndKey = (await neighborhoodEndTask)?.Key;
                 trip.PatternAreaStartKey = (await patternAreaStartTask)?.Key;
                 trip.PatternAreaEndKey = (await patternAreaEndTask)?.Key;
 
-                // if we've already calculated a segment group, don't repeat the expensive process
-                trip.StreetSegmentGroupKey = await existingSegmentGroupTask ??
-                    (await StreetSegmentGroupRepository.CreateGroup(
-                        await StreetSegmentRepository.Find(Mapper.Map<LineString>(trip.Route))
-                    ))?.Key;
+                trip.StreetSegmentGroupKey = trip.StreetSegmentGroupKey ??
+                    (await StreetSegmentGroupRepository.CreateGroup(await segmentsTask))?.Key;
+                trip.BicyclePathGroupKey = trip.BicyclePathGroupKey ??
+                    (await BicyclePathGroupRepository.CreateGroup(await pathsTask))?.Key;
 
                 // add it to the database
                 try
