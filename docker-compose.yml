@@ -7,10 +7,15 @@ services:
     environment:
       POSTGRES_DB: scootertown
       POSTGRES_USER: scootertownadmin
+      POSTGRES_PASSWORD: scootertown
+    volumes:
+      - ./backups:/docker-entrypoint-initdb.d
   api:
     build:
       context: .
       dockerfile: api.Dockerfile
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
     ports:
       - 5000:80
     depends_on:
@@ -20,6 +25,12 @@ services:
     build: 
       context: .
       dockerfile: integration.Dockerfile
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
+      - ./neighborhoods.json:/app/neighborhoods.json
+      - ./pattern_areas.json:/app/pattern_areas.json
+      - ./street_segment_midpoints.json:/app/street_segment_midpoints.json
+      - ./bike_path_midpoints.json:/app/bike_path_midpoints.json
     depends_on:
       - db
       - api
