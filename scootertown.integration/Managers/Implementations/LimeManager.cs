@@ -84,14 +84,12 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                     }
                     trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
                     Offset += 1;
-                }
-                else
-                {
-                    throw new Exception($"Error retrieving trips for {CompanyName}");
+
+                    return new Queue<TripDTO>(trips.Select(t => Mapper.Map<TripDTO>(t)).ToList());
                 }
             }
 
-            return new Queue<TripDTO>(trips.Select(t => Mapper.Map<TripDTO>(t)).ToList());
+            throw new Exception($"Error retrieving trips for {CompanyName}");
         }
     }
 }
