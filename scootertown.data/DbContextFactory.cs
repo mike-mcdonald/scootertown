@@ -11,7 +11,7 @@ namespace PDX.PBOT.Scootertown.Data
         {
             var builder = new DbContextOptionsBuilder<ScootertownDbContext>();
             builder.UseNpgsql(
-                @"Host=localhost;Database=scootertown;Username=scootertownadmin;Password=b43b25iun8fneufniosergigakei0r",
+                @"Host=localhost;Database=scootertown;Username=scootertownadmin;Password=scootertown",
                 o => o.UseNetTopologySuite()
             );
             var options = builder.Options;
