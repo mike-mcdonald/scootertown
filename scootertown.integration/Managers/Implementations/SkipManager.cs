@@ -14,6 +14,8 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 {
     public class SkipManager : CompanyManagerBase
     {
+        private string LastTrip { get; set; }
+
         public SkipManager(IConfigurationSection configuration) : base("Skip", configuration) { }
 
         public override async Task<Queue<DeploymentDTO>> RetrieveAvailability()
@@ -61,14 +63,16 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
 
         public override async Task<Queue<TripDTO>> RetrieveTrips()
         {
-            using (var response = await Client.GetAsync($"trips.json"))
+            var limit = 500;
+
+            using (var response = await Client.GetAsync($"trips.json?limit={limit}&startAfter={LastTrip}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
                     try
                     {
                         var trips = await response.DeserializeJson(new List<TripDTO>());
-
+                        LastTrip = trips?.LastOrDefault()?.AlternateKey;
                         return new Queue<TripDTO>(trips);
                     }
                     catch (Exception e)
