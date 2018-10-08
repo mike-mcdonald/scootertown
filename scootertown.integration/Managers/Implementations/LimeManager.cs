@@ -82,8 +82,10 @@ namespace PDX.PBOT.Scootertown.Integration.Managers.Implementations
                         //  return the empty queue.
                         return trips;
                     }
-                    trips = (await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() })).data;
-                    Offset += 1;
+                    var result = await response.DeserializeJson(new { max_page = 1, data = new Queue<TripDTO>() });
+                    trips = result.data;
+                    // if we received the last page, reset the counter
+                    Offset = result.max_page == Offset ? 0 : Offset + 1;
 
                     return new Queue<TripDTO>(trips.Select(t => Mapper.Map<TripDTO>(t)).ToList());
                 }
