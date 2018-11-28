@@ -15,6 +15,23 @@ namespace PDX.PBOT.Scootertown.Data.Repositories.Implementations
         {
         }
 
+        public override async Task<BicyclePath> Add(BicyclePath item, bool saveImmediately)
+        {
+            var existingItem = await Context.Set<BicyclePath>().Where(n => n.Geometry == item.Geometry).FirstOrDefaultAsync();
+
+            if (existingItem == null)
+            {
+                await Context.Set<BicyclePath>().AddAsync(item);
+                var changes = saveImmediately ? await Context.SaveChangesAsync() : 0;
+                return item;
+            }
+            else
+            {
+                item.Key = existingItem.Key;
+                return await Update(item);
+            }
+        }
+
         public async Task<List<BicyclePath>> Find(LineString line) =>
             await Context.Set<BicyclePath>()
             .Where(x => x.Geometry.Intersects(line))
