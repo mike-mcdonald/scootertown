@@ -53,6 +53,8 @@ namespace PDX.PBOT.Scootertown.Data.Extensions
 
                 path.Property(x => x.Name).HasMaxLength(200);
                 path.Property(x => x.AlternateKey).HasMaxLength(32).IsRequired();
+                path.Property(x => x.Status);
+                path.Property(x => x.Type);
                 path.Property(x => x.Geometry);
                 path.Property(x => x.X);
                 path.Property(x => x.Y);

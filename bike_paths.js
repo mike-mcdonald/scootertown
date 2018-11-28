@@ -25,7 +25,9 @@ collection.features.forEach((feature) => {
         {
           name: feature.properties.SegmentName,
           status: statusMap[feature.properties.Status],
+          type: feature.properties.Facility,
           objectId: feature.properties.OBJECTID,
+          tranPlanID: feature.properties.TranPlanID,
         }
       )
     );
